@@ -2,6 +2,8 @@
 import os
 
 DEBUG = True
+SITE_ID = 1
+ACCOUNT_ACTIVATION_DAYS = 7
 
 DATABASES={
     "default": {
@@ -42,6 +44,8 @@ EXTERNAL_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
+    'django_libs',
+    'registration',
 ]
 
 INTERNAL_APPS = [

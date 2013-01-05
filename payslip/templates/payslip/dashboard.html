@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+<h1>{% trans "Payslip dashboard" %}</h1>
+
+<ul>
+    <li><a href="{% url "payslip_company_create" %}">{% trans "Create new company" %}</a></li>
+</ul>
+
+<h2>{% trans "Companies" %}</h2>
+<ul>
+    {% for company in companies %}
+        <li>{{ company }} <a href="{% url "payslip_company_update" pk=company.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_company_delete" pk=company.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No companies available." %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

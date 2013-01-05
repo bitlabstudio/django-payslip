@@ -1,0 +1,12 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+<h1>{% trans "Create a new company" %}</h1>
+
+<form method="post" action=".">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="{% trans "Save" %}" />
+</form>
+{% endblock %}

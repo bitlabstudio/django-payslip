@@ -15,3 +15,6 @@ django-nose
 coverage
 django-coverage
 selenium
+factory_boy==1.2.0
+-e git+git://github.com/bitmazk/django-libs.git@8a72ac99ddc27dff22fb06a528db6c81c84b212a#egg=django_libs
+django-registration==0.8
