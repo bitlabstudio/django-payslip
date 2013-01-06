@@ -5,6 +5,9 @@ from payslip.views import (
     CompanyCreateView,
     CompanyDeleteView,
     CompanyUpdateView,
+    EmployeeCreateView,
+    EmployeeDeleteView,
+    EmployeeUpdateView,
     DashboardView,
 )
 
@@ -31,5 +34,20 @@ urlpatterns = patterns(
     url(r'^company/(?P<pk>\d+)/delete/$',
         CompanyDeleteView.as_view(),
         name='payslip_company_delete',
+    ),
+
+    url(r'^employee/create/$',
+        EmployeeCreateView.as_view(),
+        name='payslip_employee_create',
+    ),
+
+    url(r'^employee/(?P<pk>\d+)/update/$',
+        EmployeeUpdateView.as_view(),
+        name='payslip_employee_update',
+    ),
+
+    url(r'^employee/(?P<pk>\d+)/delete/$',
+        EmployeeDeleteView.as_view(),
+        name='payslip_employee_delete',
     ),
 )

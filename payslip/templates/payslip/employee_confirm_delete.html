@@ -1,0 +1,12 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+<h1>{{ object }}</h1>
+
+<form method="post" action=".">
+    {% csrf_token %}
+    {% trans "Are you sure that you want to delete this employee?" %}
+    <input type="submit" value="{% trans "Delete" %}" />
+</form>
+{% endblock %}

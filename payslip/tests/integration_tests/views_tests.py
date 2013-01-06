@@ -6,6 +6,9 @@ from django_libs.tests.factories import UserFactory
 from django_libs.tests.mixins import ViewTestMixin
 from payslip.tests.factories import (
     CompanyFactory,
+    EmployeeFactory,
+    ManagerFactory,
+    StaffFactory,
 )
 
 
@@ -43,8 +46,7 @@ class CompanyCreateViewTestCase(ViewTestMixin, TestCase):
         self.should_redirect_to_login_when_anonymous()
         self.should_be_callable_when_authenticated(self.user)
         self.is_callable(method='POST', data={'name': 'Foo'}, user=self.user,
-                         and_redirects_to=reverse('payslip_company_update',
-                                                  kwargs={'pk': 1}))
+                         and_redirects_to=reverse('payslip_dashboard'))
 
 
 class CompanyUpdateViewTestCase(ViewTestMixin, TestCase):
@@ -87,4 +89,71 @@ class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
         self.user.save()
         self.should_be_callable_when_authenticated(self.user)
         self.is_callable(method='POST', data={'name': 'Foo'}, user=self.user,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the CreateView ``EmployeeCreateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.manager = ManagerFactory()
+
+    def get_view_name(self):
+        return 'payslip_employee_create'
+
+    def test_view(self):
+        self.should_redirect_to_login_when_anonymous()
+        self.should_be_callable_when_authenticated(self.manager.user)
+        data = {
+            'first_name': 'Foo',
+            'last_name': 'Bar',
+            'email': 'test@example.com',
+            'password': 'test',
+            'retype_password': 'test',
+            'title': '1',
+        }
+        self.is_callable(method='POST', data=data, user=self.manager.user,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``EmployeeUpdateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.manager = ManagerFactory()
+        self.employee = EmployeeFactory(company=self.manager.company)
+        self.staff = StaffFactory()
+
+    def get_view_name(self):
+        return 'payslip_employee_update'
+
+    def get_view_kwargs(self):
+        return {'pk': self.employee.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.manager.user)
+        self.is_not_callable(user=self.employee.user)
+        self.should_be_callable_when_authenticated(self.staff)
+
+
+class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``EmployeeDeleteView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.manager = ManagerFactory()
+        self.employee = EmployeeFactory(company=self.manager.company)
+
+    def get_view_name(self):
+        return 'payslip_employee_delete'
+
+    def get_view_kwargs(self):
+        return {'pk': self.employee.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.manager.user)
+        self.is_callable(method='POST', data={'name': 'Foo'},
+                         user=self.manager.user,
                          and_redirects_to=reverse('payslip_dashboard'))

@@ -72,10 +72,10 @@ class Employee(models.Model):
         max_length=1,
         verbose_name=_('Title'),
         choices=(
-            (0, 'Ms.'),
-            (1, 'Mrs.'),
-            (2, 'Mr.'),
-            (3, 'Dr.'),
+            ('1', 'Ms.'),
+            ('2', 'Mrs.'),
+            ('3', 'Mr.'),
+            ('4', 'Dr.'),
         )
     )
 
@@ -84,6 +84,14 @@ class Employee(models.Model):
         verbose_name=_('Extra fields'),
         blank=True, null=True,
     )
+
+    is_manager = models.BooleanField(
+        default=False,
+        verbose_name=_('is Manager'),
+    )
+
+    def __unicode__(self):
+        return '{0} {1}'.format(self.user.first_name, self.user.last_name)
 
 
 class ExtraFieldType(models.Model):

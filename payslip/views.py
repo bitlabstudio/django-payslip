@@ -10,6 +10,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from payslip.forms import EmployeeForm
 from payslip.models import Company, Employee
 
 
@@ -33,8 +34,6 @@ class PermissionMixin(object):
 
 class CompanyMixin(object):
     """Mixin to handle company related functions."""
-    model = Company
-
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         """
@@ -45,11 +44,41 @@ class CompanyMixin(object):
         self.kwargs = kwargs
         self.object = self.get_object()
         try:
-            Employee.objects.get(company=self.object, user=request.user)
+            Employee.objects.get(company=self.object, user=request.user,
+                                 is_manager=True)
         except Employee.DoesNotExist:
             if not request.user.is_staff:
                 raise Http404
         return super(CompanyMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('payslip_dashboard')
+
+
+class EmployeeMixin(object):
+    """Mixin to handle employee related functions."""
+    form_class = EmployeeForm
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Makes sure that the user is logged in and has the right to display this
+        view.
+
+        """
+        try:
+            self.company = Employee.objects.get(
+                user=request.user, is_manager=True).company
+        except Employee.DoesNotExist:
+            if not request.user.is_staff:
+                raise Http404
+            self.company = None
+        return super(EmployeeMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(EmployeeMixin, self).get_form_kwargs()
+        kwargs.update({'company': self.company})
+        return kwargs
 
     def get_success_url(self):
         return reverse('payslip_dashboard')
@@ -66,6 +95,7 @@ class DashboardView(PermissionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         return {
             'companies': Company.objects.all(),
+            'employees': Employee.objects.all(),
         }
 
 
@@ -74,14 +104,29 @@ class CompanyCreateView(PermissionMixin, CreateView):
     model = Company
 
     def get_success_url(self):
-        return reverse('payslip_company_update', kwargs={'pk': self.object.id})
+        return reverse('payslip_dashboard')
 
 
 class CompanyUpdateView(CompanyMixin, UpdateView):
     """Classic view to update a company."""
-    pass
+    model = Company
 
 
 class CompanyDeleteView(CompanyMixin, DeleteView):
     """Classic view to delete a company."""
-    pass
+    model = Company
+
+
+class EmployeeCreateView(EmployeeMixin, CreateView):
+    """Classic view to create an employee."""
+    model = Employee
+
+
+class EmployeeUpdateView(EmployeeMixin, UpdateView):
+    """Classic view to update an employee."""
+    model = Employee
+
+
+class EmployeeDeleteView(EmployeeMixin, DeleteView):
+    """Classic view to delete an employee."""
+    model = Employee

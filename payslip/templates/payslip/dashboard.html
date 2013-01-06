@@ -6,6 +6,7 @@
 
 <ul>
     <li><a href="{% url "payslip_company_create" %}">{% trans "Create new company" %}</a></li>
+    <li><a href="{% url "payslip_employee_create" %}">{% trans "Create new employee" %}</a></li>
 </ul>
 
 <h2>{% trans "Companies" %}</h2>
@@ -14,6 +15,15 @@
         <li>{{ company }} <a href="{% url "payslip_company_update" pk=company.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_company_delete" pk=company.pk %}">{% trans "Delete" %}</a></li>
     {% empty %}
         <li>{% trans "No companies available." %}</li>
+    {% endfor %}
+</ul>
+
+<h2>{% trans "Employees" %}</h2>
+<ul>
+    {% for employee in employees %}
+        <li>{{ employee }} <a href="{% url "payslip_employee_update" pk=employee.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_employee_delete" pk=employee.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No employees available." %}</li>
     {% endfor %}
 </ul>
 {% endblock %}
