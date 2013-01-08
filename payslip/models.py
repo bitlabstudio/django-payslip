@@ -147,6 +147,8 @@ class ExtraField(models.Model):
         'payslip.ExtraFieldType',
         verbose_name=_('Field type'),
         related_name='extra_fields',
+        help_text=_('Only field types with fixed values can be chosen to add'
+                    ' global values.'),
     )
 
     value = models.CharField(

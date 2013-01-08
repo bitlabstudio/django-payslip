@@ -16,7 +16,7 @@ from payslip.tests.factories import (
 
 class DashboardViewTestCase(ViewTestMixin, TestCase):
     """Tests for the TemplateView ``DashboardView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.user = UserFactory()
@@ -33,7 +33,7 @@ class DashboardViewTestCase(ViewTestMixin, TestCase):
 
 class CompanyCreateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the CreateView ``CompanyCreateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.user = UserFactory()
@@ -51,7 +51,7 @@ class CompanyCreateViewTestCase(ViewTestMixin, TestCase):
 
 class CompanyUpdateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``CompanyUpdateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.user = UserFactory()
@@ -71,7 +71,7 @@ class CompanyUpdateViewTestCase(ViewTestMixin, TestCase):
 
 class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``CompanyDeleteView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.user = UserFactory()
@@ -94,7 +94,7 @@ class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
 
 class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the CreateView ``EmployeeCreateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.manager = ManagerFactory()
@@ -118,7 +118,7 @@ class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
 
 class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``EmployeeUpdateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.manager = ManagerFactory()
@@ -128,8 +128,7 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
         extra_field_type2 = ExtraFieldTypeFactory(name='Tax Class')
         extra_field_type3 = ExtraFieldTypeFactory(name='Health',
                                                        fixed_values=False)
-        extra_field_type4 = ExtraFieldTypeFactory(name='Religion',
-                                                       fixed_values=False)
+        ExtraFieldTypeFactory(name='Religion', fixed_values=False)
         extra_field = ExtraFieldFactory(field_type=extra_field_type)
         self.employee.extra_fields.add(extra_field)
         extra_field2 = ExtraFieldFactory(field_type=extra_field_type2,
@@ -164,7 +163,7 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
 
 class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``EmployeeDeleteView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.manager = ManagerFactory()
@@ -185,7 +184,7 @@ class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldCreateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the CreateView ``ExtraFieldCreateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.staff = StaffFactory()
@@ -206,7 +205,7 @@ class ExtraFieldCreateViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldUpdateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldUpdateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.extra_field = ExtraFieldFactory()
@@ -224,7 +223,7 @@ class ExtraFieldUpdateViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldDeleteView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.staff = StaffFactory()
@@ -248,7 +247,7 @@ class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldTypeCreateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the CreateView ``ExtraFieldTypeCreateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.staff = StaffFactory()
@@ -264,7 +263,7 @@ class ExtraFieldTypeCreateViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldTypeUpdateViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldTypeUpdateView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.extra_field_type = ExtraFieldTypeFactory()
@@ -282,7 +281,7 @@ class ExtraFieldTypeUpdateViewTestCase(ViewTestMixin, TestCase):
 
 class ExtraFieldTypeDeleteViewTestCase(ViewTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldTypeDeleteView``."""
-    longMessage= True
+    longMessage = True
 
     def setUp(self):
         self.staff = StaffFactory()

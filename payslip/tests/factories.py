@@ -47,7 +47,7 @@ class ExtraFieldTypeFactory(factory.Factory):
 
     name = 'Foo'
     fixed_values = True
-    model='Employee'
+    model = 'Employee'
 
 
 class ExtraFieldFactory(factory.Factory):

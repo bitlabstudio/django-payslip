@@ -3,28 +3,28 @@ import os
 
 DEBUG = True
 
-DATABASES={
+DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
     }
 }
 
-ROOT_URLCONF='payslip.tests.urls'
+ROOT_URLCONF = 'payslip.tests.urls'
 
-STATIC_URL='/static/'
+STATIC_URL = '/static/'
 
-STATIC_ROOT=os.path.join(__file__, '../../static/')
+STATIC_ROOT = os.path.join(__file__, '../../static/')
 
-STATICFILES_DIRS=(
+STATICFILES_DIRS = (
     os.path.join(__file__, 'test_static'),
 )
 
-TEMPLATE_DIRS=(
+TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), '../templates'),
 )
 
-COVERAGE_REPORT_HTML_OUTPUT_DIR=os.path.join(
+COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(
     os.path.dirname(__file__), 'coverage')
 
 COVERAGE_MODULE_EXCLUDES = [
