@@ -10,7 +10,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from payslip.forms import EmployeeForm
+from payslip.forms import EmployeeForm, ExtraFieldForm
 from payslip.models import Company, Employee, ExtraField, ExtraFieldType
 
 
@@ -87,6 +87,7 @@ class EmployeeMixin(object):
 class ExtraFieldMixin(object):
     """Mixin to handle extra field related functions."""
     model = ExtraField
+    form_class = ExtraFieldForm
 
     def get_success_url(self):
         return reverse('payslip_dashboard')
@@ -112,6 +113,9 @@ class DashboardView(PermissionMixin, TemplateView):
         return {
             'companies': Company.objects.all(),
             'employees': Employee.objects.all(),
+            'extra_field_types': ExtraFieldType.objects.all(),
+            'fixed_value_extra_fields': ExtraField.objects.filter(
+                field_type__fixed_values=True),
         }
 
 

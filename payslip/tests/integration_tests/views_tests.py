@@ -25,7 +25,6 @@ class DashboardViewTestCase(ViewTestMixin, TestCase):
         return 'payslip_dashboard'
 
     def test_view(self):
-        self.should_redirect_to_login_when_anonymous()
         self.is_not_callable(user=self.user)
         self.user.is_staff = True
         self.user.save()
@@ -45,7 +44,6 @@ class CompanyCreateViewTestCase(ViewTestMixin, TestCase):
         return 'payslip_company_create'
 
     def test_view(self):
-        self.should_redirect_to_login_when_anonymous()
         self.should_be_callable_when_authenticated(self.user)
         self.is_callable(method='POST', data={'name': 'Foo'}, user=self.user,
                          and_redirects_to=reverse('payslip_dashboard'))
@@ -105,7 +103,6 @@ class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
         return 'payslip_employee_create'
 
     def test_view(self):
-        self.should_redirect_to_login_when_anonymous()
         self.should_be_callable_when_authenticated(self.manager.user)
         data = {
             'first_name': 'Foo',
@@ -127,6 +124,20 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
         self.manager = ManagerFactory()
         self.employee = EmployeeFactory(company=self.manager.company)
         self.staff = StaffFactory()
+        extra_field_type = ExtraFieldTypeFactory()
+        extra_field_type2 = ExtraFieldTypeFactory(name='Tax Class')
+        extra_field_type3 = ExtraFieldTypeFactory(name='Health',
+                                                       fixed_values=False)
+        extra_field_type4 = ExtraFieldTypeFactory(name='Religion',
+                                                       fixed_values=False)
+        extra_field = ExtraFieldFactory(field_type=extra_field_type)
+        self.employee.extra_fields.add(extra_field)
+        extra_field2 = ExtraFieldFactory(field_type=extra_field_type2,
+                                         value='II')
+        self.employee.extra_fields.add(extra_field2)
+        extra_field3 = ExtraFieldFactory(field_type=extra_field_type3,
+                                         value='yes')
+        self.employee.extra_fields.add(extra_field3)
 
     def get_view_name(self):
         return 'payslip_employee_update'
@@ -138,6 +149,17 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
         self.should_be_callable_when_authenticated(self.manager.user)
         self.is_not_callable(user=self.employee.user)
         self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'first_name': 'Foo',
+            'last_name': 'Bar',
+            'email': '{0}'.format(self.employee.user.email),
+            'title': '1',
+            'Tax Class': 'II',
+            'Health': 'no',
+            'Religion': 'None',
+        }
+        self.is_callable(method='POST', data=data, user=self.manager.user,
+                         and_redirects_to=reverse('payslip_dashboard'))
 
 
 class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
@@ -173,7 +195,6 @@ class ExtraFieldCreateViewTestCase(ViewTestMixin, TestCase):
         return 'payslip_extra_field_create'
 
     def test_view(self):
-        self.should_redirect_to_login_when_anonymous()
         self.should_be_callable_when_authenticated(self.staff)
         data = {
             'field_type': self.extra_field_type.id,
@@ -236,7 +257,6 @@ class ExtraFieldTypeCreateViewTestCase(ViewTestMixin, TestCase):
         return 'payslip_extra_field_type_create'
 
     def test_view(self):
-        self.should_redirect_to_login_when_anonymous()
         self.should_be_callable_when_authenticated(self.staff)
         self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
                          and_redirects_to=reverse('payslip_dashboard'))

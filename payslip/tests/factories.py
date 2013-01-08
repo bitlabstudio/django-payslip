@@ -45,7 +45,9 @@ class ExtraFieldTypeFactory(factory.Factory):
     """Factory for the model ``ExtraFieldType``."""
     FACTORY_FOR = ExtraFieldType
 
-    name = "Foo"
+    name = 'Foo'
+    fixed_values = True
+    model='Employee'
 
 
 class ExtraFieldFactory(factory.Factory):
@@ -53,4 +55,4 @@ class ExtraFieldFactory(factory.Factory):
     FACTORY_FOR = ExtraField
 
     field_type = factory.SubFactory(ExtraFieldTypeFactory)
-    value = "Foo"
+    value = 'Foo'

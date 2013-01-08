@@ -2,10 +2,11 @@
 import md5
 
 from django.contrib.auth.models import make_password, User
+from django.db.models import Q
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from payslip.models import Company, Employee
+from payslip.models import Company, Employee, ExtraField, ExtraFieldType
 
 
 def get_md5_hexdigest(email):
@@ -52,9 +53,43 @@ class EmployeeForm(forms.ModelForm):
 
     def __init__(self, company, *args, **kwargs):
         self.company = company
+        self.extra_field_types = ExtraFieldType.objects.filter(
+            Q(model=self.Meta.model.__name__) | Q(model__isnull=True))
+        if kwargs.get('instance'):
+            instance = kwargs.get('instance')
+            user = instance.user
+            kwargs['initial'] = {
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+            }
+            for extra_field_type in self.extra_field_types:
+                try:
+                    field = instance.extra_fields.get(
+                        field_type__name=extra_field_type.name)
+                except ExtraField.DoesNotExist:
+                    pass
+                else:
+                    kwargs['initial'].update({'{0}'.format(
+                        extra_field_type.name): field.value})
         super(EmployeeForm, self).__init__(*args, **kwargs)
+        if self.instance.id:
+            del self.fields['password']
+            del self.fields['retype_password']
         if self.company and self.company.pk:
             del self.fields['company']
+        for extra_field_type in self.extra_field_types:
+            if extra_field_type.fixed_values:
+                choices = [(x.value, x.value)
+                           for x in extra_field_type.extra_fields.all()]
+                choices.append(('', '-----'))
+                self.fields[extra_field_type.name] = forms.ChoiceField(
+                    required=False,
+                    choices=list(set(choices)),
+                )
+            else:
+                self.fields[extra_field_type.name] = forms.CharField(
+                    required=False, max_length=200)
 
     def clean_email(self):
         """
@@ -64,8 +99,10 @@ class EmployeeForm(forms.ModelForm):
         """
         email = self.cleaned_data['email']
         try:
-            User.objects.get(email__iexact=email)
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
+            return email
+        if self.instance.id and user == self.instance.user:
             return email
         raise forms.ValidationError(
             _('A user with that email already exists.'))
@@ -90,19 +127,70 @@ class EmployeeForm(forms.ModelForm):
         return self.cleaned_data
 
     def save(self, *args, **kwargs):
-        user = User(
-            username=self.cleaned_data.get('email'),
-            first_name=self.cleaned_data.get('first_name'),
-            last_name=self.cleaned_data.get('last_name'),
-            email=self.cleaned_data.get('email'),
-            password=make_password(self.cleaned_data.get('password')),
-        )
-        user.save()
-        self.instance.user = user
+        if self.instance.id:
+            User.objects.filter(pk=self.instance.user.pk).update(
+                first_name=self.cleaned_data.get('first_name'),
+                last_name=self.cleaned_data.get('last_name'),
+                email=self.cleaned_data.get('email'),
+            )
+        else:
+            user = User(
+                username=self.cleaned_data.get('email'),
+                first_name=self.cleaned_data.get('first_name'),
+                last_name=self.cleaned_data.get('last_name'),
+                email=self.cleaned_data.get('email'),
+                password=make_password(self.cleaned_data.get('password')),
+            )
+            user.save()
+            self.instance.user = user
         if self.company and self.company.pk:
             self.instance.company = Company.objects.get(pk=self.company.pk)
+        for extra_field_type in self.extra_field_types:
+            try:
+                field_to_save = self.instance.extra_fields.get(
+                    field_type__name=extra_field_type.name)
+            except ExtraField.DoesNotExist:
+                field_to_save = None
+            if extra_field_type.fixed_values:
+                if field_to_save:
+                    self.instance.extra_fields.remove(
+                        self.instance.extra_fields.get(
+                            field_type__name=extra_field_type.name))
+                try:
+                    field_to_save = ExtraField.objects.get(
+                        field_type__name=extra_field_type.name,
+                        value=self.data.get(extra_field_type.name))
+                except ExtraField.DoesNotExist:
+                    pass
+                else:
+                    self.instance.extra_fields.add(field_to_save)
+            else:
+                if field_to_save:
+                    field_to_save.value = self.data.get(extra_field_type.name)
+                    field_to_save.save()
+                elif self.data.get(extra_field_type.name):
+                    new_field = ExtraField(
+                        field_type=extra_field_type,
+                        value=self.data.get(extra_field_type.name),
+                    )
+                    new_field.save()
+                    self.instance.extra_fields.add(new_field)
         return super(EmployeeForm, self).save(*args, **kwargs)
 
     class Meta:
         model = Employee
-        exclude = ('user')
+        exclude = ('user', 'extra_fields')
+
+
+class ExtraFieldForm(forms.ModelForm):
+    """
+    Form to create a new ExtraField instance.
+
+    """
+    def __init__(self, *args, **kwargs):
+        super(ExtraFieldForm, self).__init__(*args, **kwargs)
+        self.fields['field_type'].queryset = ExtraFieldType.objects.filter(
+            fixed_values=True)
+
+    class Meta:
+        model = ExtraField

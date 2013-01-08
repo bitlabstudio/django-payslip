@@ -20,8 +20,6 @@ from payslip.views import (
 
 urlpatterns = patterns(
     '',
-    (r'^accounts/', include('registration.backends.default.urls')),
-
     url(r'^$',
         DashboardView.as_view(),
         name='payslip_dashboard',

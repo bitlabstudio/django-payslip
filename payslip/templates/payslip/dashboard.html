@@ -5,8 +5,28 @@
 <h1>{% trans "Payslip dashboard" %}</h1>
 
 <ul>
+    <li><a href="{% url "payslip_extra_field_type_create" %}">{% trans "Create new extra field type" %}</a></li>
+    <li><a href="{% url "payslip_extra_field_create" %}">{% trans "Create new extra field" %}</a></li>
     <li><a href="{% url "payslip_company_create" %}">{% trans "Create new company" %}</a></li>
     <li><a href="{% url "payslip_employee_create" %}">{% trans "Create new employee" %}</a></li>
+</ul>
+
+<h2>{% trans "Extra fields" %}</h2>
+<ul>
+    {% for type in extra_field_types %}
+        <li>{{ type }} <a href="{% url "payslip_extra_field_type_update" pk=type.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_extra_field_type_delete" pk=type.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No extra field types available." %}</li>
+    {% endfor %}
+</ul>
+
+<h2>{% trans "Fixed value extra fields" %}</h2>
+<ul>
+    {% for type in fixed_value_extra_fields %}
+        <li>{{ type }} <a href="{% url "payslip_extra_field_update" pk=type.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_extra_field_delete" pk=type.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No extra fields available." %}</li>
+    {% endfor %}
 </ul>
 
 <h2>{% trans "Companies" %}</h2>

@@ -100,6 +100,8 @@ class ExtraFieldType(models.Model):
 
     :name: Name of the attribute.
     :description: Description of the attribute.
+    :model: Can be set in order to allow the use of only one model.
+    :fixed_values: Can transform related exta fields into choices.
 
     """
     name = models.CharField(
@@ -112,6 +114,25 @@ class ExtraFieldType(models.Model):
         blank=True, null=True,
         verbose_name=_('Description'),
     )
+
+    model = models.CharField(
+        max_length=10,
+        choices=(
+            ('Employee', 'Employee'),
+            ('Payment', 'Payment'),
+            ('Company', 'Company'),
+        ),
+        verbose_name=_('Model'),
+        blank=True, null=True,
+    )
+
+    fixed_values = models.BooleanField(
+        default=False,
+        verbose_name=_('Fixed values'),
+    )
+
+    def __unicode__(self):
+        return '{0}'.format(self.name)
 
 
 class ExtraField(models.Model):
@@ -132,6 +153,11 @@ class ExtraField(models.Model):
         max_length=200,
         verbose_name=_('Value'),
     )
+
+    def __unicode__(self):
+        return '{0} ({1}) - {2}'.format(
+            self.field_type, self.field_type.get_model_display() or 'general',
+            self.value)
 
 
 class PaymentType(models.Model):
