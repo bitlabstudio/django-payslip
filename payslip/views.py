@@ -11,7 +11,7 @@ from django.views.generic import (
 )
 
 from payslip.forms import EmployeeForm
-from payslip.models import Company, Employee
+from payslip.models import Company, Employee, ExtraField, ExtraFieldType
 
 
 #-------------#
@@ -84,6 +84,22 @@ class EmployeeMixin(object):
         return reverse('payslip_dashboard')
 
 
+class ExtraFieldMixin(object):
+    """Mixin to handle extra field related functions."""
+    model = ExtraField
+
+    def get_success_url(self):
+        return reverse('payslip_dashboard')
+
+
+class ExtraFieldTypeMixin(object):
+    """Mixin to handle extra field type related functions."""
+    model = ExtraFieldType
+
+    def get_success_url(self):
+        return reverse('payslip_dashboard')
+
+
 #-------------#
 # Views       #
 #-------------#
@@ -130,3 +146,36 @@ class EmployeeUpdateView(EmployeeMixin, UpdateView):
 class EmployeeDeleteView(EmployeeMixin, DeleteView):
     """Classic view to delete an employee."""
     model = Employee
+
+
+class ExtraFieldTypeCreateView(PermissionMixin, ExtraFieldTypeMixin,
+                               CreateView):
+    """Classic view to create an extra field type."""
+    model = ExtraFieldType
+
+
+class ExtraFieldTypeUpdateView(PermissionMixin, ExtraFieldTypeMixin,
+                               UpdateView):
+    """Classic view to update an extra field type."""
+    model = ExtraFieldType
+
+
+class ExtraFieldTypeDeleteView(PermissionMixin, ExtraFieldTypeMixin,
+                               DeleteView):
+    """Classic view to delete an extra field type."""
+    model = ExtraFieldType
+
+
+class ExtraFieldCreateView(PermissionMixin, ExtraFieldMixin, CreateView):
+    """Classic view to create an extra field."""
+    model = ExtraField
+
+
+class ExtraFieldUpdateView(PermissionMixin, ExtraFieldMixin, UpdateView):
+    """Classic view to update an extra field."""
+    model = ExtraField
+
+
+class ExtraFieldDeleteView(PermissionMixin, ExtraFieldMixin, DeleteView):
+    """Classic view to delete an extra field."""
+    model = ExtraField

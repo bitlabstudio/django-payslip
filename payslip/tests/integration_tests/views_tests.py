@@ -7,6 +7,8 @@ from django_libs.tests.mixins import ViewTestMixin
 from payslip.tests.factories import (
     CompanyFactory,
     EmployeeFactory,
+    ExtraFieldFactory,
+    ExtraFieldTypeFactory,
     ManagerFactory,
     StaffFactory,
 )
@@ -156,4 +158,123 @@ class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
         self.should_be_callable_when_authenticated(self.manager.user)
         self.is_callable(method='POST', data={'name': 'Foo'},
                          user=self.manager.user,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class ExtraFieldCreateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the CreateView ``ExtraFieldCreateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.extra_field_type = ExtraFieldTypeFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_create'
+
+    def test_view(self):
+        self.should_redirect_to_login_when_anonymous()
+        self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'field_type': self.extra_field_type.id,
+            'value': 'Bar',
+        }
+        self.is_callable(method='POST', data=data, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class ExtraFieldUpdateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``ExtraFieldUpdateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.extra_field = ExtraFieldFactory()
+        self.staff = StaffFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_update'
+
+    def get_view_kwargs(self):
+        return {'pk': self.extra_field.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+
+
+class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``ExtraFieldDeleteView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.extra_field = ExtraFieldFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_delete'
+
+    def get_view_kwargs(self):
+        return {'pk': self.extra_field.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'field_type': self.extra_field.field_type.id,
+            'value': 'Bar',
+        }
+        self.is_callable(method='POST', data=data, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class ExtraFieldTypeCreateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the CreateView ``ExtraFieldTypeCreateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_type_create'
+
+    def test_view(self):
+        self.should_redirect_to_login_when_anonymous()
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class ExtraFieldTypeUpdateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``ExtraFieldTypeUpdateView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.extra_field_type = ExtraFieldTypeFactory()
+        self.staff = StaffFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_type_update'
+
+    def get_view_kwargs(self):
+        return {'pk': self.extra_field_type.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+
+
+class ExtraFieldTypeDeleteViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``ExtraFieldTypeDeleteView``."""
+    longMessage= True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.extra_field_type = ExtraFieldTypeFactory()
+
+    def get_view_name(self):
+        return 'payslip_extra_field_type_delete'
+
+    def get_view_kwargs(self):
+        return {'pk': self.extra_field_type.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'name': 'Foo'}, user=self.staff,
                          and_redirects_to=reverse('payslip_dashboard'))

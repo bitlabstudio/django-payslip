@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class Company(models.Model):
     """
-    Model, which helds general information of a company.
+    Model, which holds general information of a company.
 
     :name: Name of the company.
     :address: Full address model fields.
@@ -35,7 +35,7 @@ class Company(models.Model):
 
 class Employee(models.Model):
     """
-    Model, which helds personal information of employee.
+    Model, which holds personal information of employee.
 
     :user: Connection to the django user model, to allow a login.
     :company: Connection to the employee's company.

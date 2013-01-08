@@ -1,4 +1,4 @@
-""" Forms for the `payslip` app. """
+"""Forms for the ``payslip`` app."""
 import md5
 
 from django.contrib.auth.models import make_password, User
