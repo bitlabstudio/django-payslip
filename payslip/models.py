@@ -181,6 +181,9 @@ class PaymentType(models.Model):
         verbose_name=_('Description'),
     )
 
+    def __unicode__(self):
+        return '{0}'.format(self.name)
+
 
 class Payment(models.Model):
     """
@@ -227,3 +230,6 @@ class Payment(models.Model):
         blank=True, null=True,
         verbose_name=_('Description'),
     )
+
+    def __unicode__(self):
+        return '{0} - {1}'.format(self.payment_type, self.amount)

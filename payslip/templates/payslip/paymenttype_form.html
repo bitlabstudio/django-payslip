@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+{% if not form.instance.id %}
+    <h1>{% trans "Create a new payment type" %}</h1>
+{% else %}
+    <h1>{{ object }}</h1>
+{% endif %}
+
+<form method="post" action=".">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="{% trans "Save" %}" />
+</form>
+{% endblock %}

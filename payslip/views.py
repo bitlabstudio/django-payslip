@@ -10,8 +10,15 @@ from django.views.generic import (
     UpdateView,
 )
 
-from payslip.forms import EmployeeForm, ExtraFieldForm
-from payslip.models import Company, Employee, ExtraField, ExtraFieldType
+from payslip.forms import EmployeeForm, ExtraFieldForm, PaymentForm
+from payslip.models import (
+    Company,
+    Employee,
+    ExtraField,
+    ExtraFieldType,
+    Payment,
+    PaymentType,
+)
 
 
 #-------------#
@@ -30,6 +37,9 @@ class PermissionMixin(object):
         if not request.user.is_staff:
             raise Http404
         return super(PermissionMixin, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('payslip_dashboard')
 
 
 class CompanyMixin(object):
@@ -55,9 +65,8 @@ class CompanyMixin(object):
         return reverse('payslip_dashboard')
 
 
-class EmployeeMixin(object):
-    """Mixin to handle employee related functions."""
-    form_class = EmployeeForm
+class CompanyPermissionMixin(object):
+    """Mixin to handle company-wide permissions functions."""
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -73,15 +82,21 @@ class EmployeeMixin(object):
             if not request.user.is_staff:
                 raise Http404
             self.company = None
-        return super(EmployeeMixin, self).dispatch(request, *args, **kwargs)
+        return super(CompanyPermissionMixin, self).dispatch(request, *args,
+                                                            **kwargs)
+
+    def get_success_url(self):
+        return reverse('payslip_dashboard')
+
+
+class EmployeeMixin(object):
+    """Mixin to handle employee related functions."""
+    form_class = EmployeeForm
 
     def get_form_kwargs(self):
         kwargs = super(EmployeeMixin, self).get_form_kwargs()
         kwargs.update({'company': self.company})
         return kwargs
-
-    def get_success_url(self):
-        return reverse('payslip_dashboard')
 
 
 class ExtraFieldMixin(object):
@@ -89,16 +104,21 @@ class ExtraFieldMixin(object):
     model = ExtraField
     form_class = ExtraFieldForm
 
-    def get_success_url(self):
-        return reverse('payslip_dashboard')
-
 
 class ExtraFieldTypeMixin(object):
     """Mixin to handle extra field type related functions."""
     model = ExtraFieldType
 
-    def get_success_url(self):
-        return reverse('payslip_dashboard')
+
+class PaymentMixin(object):
+    """Mixin to handle payment related functions."""
+    model = Payment
+    form_class = PaymentForm
+
+
+class PaymentTypeMixin(object):
+    """Mixin to handle payment type related functions."""
+    model = PaymentType
 
 
 #-------------#
@@ -116,6 +136,8 @@ class DashboardView(PermissionMixin, TemplateView):
             'extra_field_types': ExtraFieldType.objects.all(),
             'fixed_value_extra_fields': ExtraField.objects.filter(
                 field_type__fixed_values=True),
+            'payments': Payment.objects.all(),
+            'payment_types': PaymentType.objects.all(),
         }
 
 
@@ -137,17 +159,17 @@ class CompanyDeleteView(CompanyMixin, DeleteView):
     model = Company
 
 
-class EmployeeCreateView(EmployeeMixin, CreateView):
+class EmployeeCreateView(CompanyPermissionMixin, EmployeeMixin, CreateView):
     """Classic view to create an employee."""
     model = Employee
 
 
-class EmployeeUpdateView(EmployeeMixin, UpdateView):
+class EmployeeUpdateView(CompanyPermissionMixin, EmployeeMixin, UpdateView):
     """Classic view to update an employee."""
     model = Employee
 
 
-class EmployeeDeleteView(EmployeeMixin, DeleteView):
+class EmployeeDeleteView(CompanyPermissionMixin, EmployeeMixin, DeleteView):
     """Classic view to delete an employee."""
     model = Employee
 
@@ -155,31 +177,64 @@ class EmployeeDeleteView(EmployeeMixin, DeleteView):
 class ExtraFieldTypeCreateView(PermissionMixin, ExtraFieldTypeMixin,
                                CreateView):
     """Classic view to create an extra field type."""
-    model = ExtraFieldType
+    pass
 
 
 class ExtraFieldTypeUpdateView(PermissionMixin, ExtraFieldTypeMixin,
                                UpdateView):
     """Classic view to update an extra field type."""
-    model = ExtraFieldType
+    pass
 
 
 class ExtraFieldTypeDeleteView(PermissionMixin, ExtraFieldTypeMixin,
                                DeleteView):
     """Classic view to delete an extra field type."""
-    model = ExtraFieldType
+    pass
 
 
 class ExtraFieldCreateView(PermissionMixin, ExtraFieldMixin, CreateView):
     """Classic view to create an extra field."""
-    model = ExtraField
+    pass
 
 
 class ExtraFieldUpdateView(PermissionMixin, ExtraFieldMixin, UpdateView):
     """Classic view to update an extra field."""
-    model = ExtraField
+    pass
 
 
 class ExtraFieldDeleteView(PermissionMixin, ExtraFieldMixin, DeleteView):
     """Classic view to delete an extra field."""
-    model = ExtraField
+    pass
+
+
+class PaymentTypeCreateView(CompanyPermissionMixin, PaymentTypeMixin,
+                            CreateView):
+    """Classic view to create a payment type."""
+    pass
+
+
+class PaymentTypeUpdateView(CompanyPermissionMixin, PaymentTypeMixin,
+                            UpdateView):
+    """Classic view to update a payment type."""
+    pass
+
+
+class PaymentTypeDeleteView(CompanyPermissionMixin, PaymentTypeMixin,
+                            DeleteView):
+    """Classic view to delete a payment type."""
+    pass
+
+
+class PaymentCreateView(CompanyPermissionMixin, PaymentMixin, CreateView):
+    """Classic view to create a payment."""
+    pass
+
+
+class PaymentUpdateView(CompanyPermissionMixin, PaymentMixin, UpdateView):
+    """Classic view to update a payment."""
+    pass
+
+
+class PaymentDeleteView(CompanyPermissionMixin, PaymentMixin, DeleteView):
+    """Classic view to delete a payment."""
+    pass

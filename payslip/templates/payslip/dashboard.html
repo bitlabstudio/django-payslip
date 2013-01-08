@@ -9,6 +9,8 @@
     <li><a href="{% url "payslip_extra_field_create" %}">{% trans "Create new extra field" %}</a></li>
     <li><a href="{% url "payslip_company_create" %}">{% trans "Create new company" %}</a></li>
     <li><a href="{% url "payslip_employee_create" %}">{% trans "Create new employee" %}</a></li>
+    <li><a href="{% url "payslip_payment_type_create" %}">{% trans "Create new payment type" %}</a></li>
+    <li><a href="{% url "payslip_payment_create" %}">{% trans "Create new payment" %}</a></li>
 </ul>
 
 <h2>{% trans "Extra fields" %}</h2>
@@ -44,6 +46,24 @@
         <li>{{ employee }} <a href="{% url "payslip_employee_update" pk=employee.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_employee_delete" pk=employee.pk %}">{% trans "Delete" %}</a></li>
     {% empty %}
         <li>{% trans "No employees available." %}</li>
+    {% endfor %}
+</ul>
+
+<h2>{% trans "Payment types" %}</h2>
+<ul>
+    {% for payment_type in payment_types %}
+        <li>{{ payment_type }} <a href="{% url "payslip_payment_type_update" pk=payment_type.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_payment_type_delete" pk=payment_type.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No payment_types available." %}</li>
+    {% endfor %}
+</ul>
+
+<h2>{% trans "Payments" %}</h2>
+<ul>
+    {% for payment in payments %}
+        <li>{{ payment }} <a href="{% url "payslip_payment_update" pk=payment.pk %}">{% trans "Update" %}</a> <a href="{% url "payslip_payment_delete" pk=payment.pk %}">{% trans "Delete" %}</a></li>
+    {% empty %}
+        <li>{% trans "No payments available." %}</li>
     {% endfor %}
 </ul>
 {% endblock %}

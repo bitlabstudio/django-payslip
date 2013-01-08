@@ -7,7 +7,14 @@ global to the project and could be shared by tests of specialized apps.
 """
 from django_libs.tests.factories import UserFactory
 import factory
-from payslip.models import Company, Employee, ExtraField, ExtraFieldType
+from payslip.models import (
+    Company,
+    Employee,
+    ExtraField,
+    ExtraFieldType,
+    Payment,
+    PaymentType,
+)
 
 
 class StaffFactory(UserFactory):
@@ -56,3 +63,19 @@ class ExtraFieldFactory(factory.Factory):
 
     field_type = factory.SubFactory(ExtraFieldTypeFactory)
     value = 'Foo'
+
+
+class PaymentTypeFactory(factory.Factory):
+    """Factory for the model ``PaymentType``."""
+    FACTORY_FOR = PaymentType
+
+    name = 'Foo'
+
+
+class PaymentFactory(factory.Factory):
+    """Factory for the model ``Payment``."""
+    FACTORY_FOR = Payment
+
+    payment_type = factory.SubFactory(PaymentTypeFactory)
+    employee = factory.SubFactory(EmployeeFactory)
+    amount = 1000.00

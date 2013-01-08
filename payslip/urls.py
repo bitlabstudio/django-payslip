@@ -15,6 +15,12 @@ from payslip.views import (
     ExtraFieldTypeDeleteView,
     ExtraFieldTypeUpdateView,
     DashboardView,
+    PaymentCreateView,
+    PaymentDeleteView,
+    PaymentUpdateView,
+    PaymentTypeCreateView,
+    PaymentTypeDeleteView,
+    PaymentTypeUpdateView,
 )
 
 
@@ -83,5 +89,35 @@ urlpatterns = patterns(
     url(r'^extra-field-type/(?P<pk>\d+)/delete/$',
         ExtraFieldTypeDeleteView.as_view(),
         name='payslip_extra_field_type_delete',
+        ),
+
+    url(r'^payment/create/$',
+        PaymentCreateView.as_view(),
+        name='payslip_payment_create',
+        ),
+
+    url(r'^payment/(?P<pk>\d+)/update/$',
+        PaymentUpdateView.as_view(),
+        name='payslip_payment_update',
+        ),
+
+    url(r'^payment/(?P<pk>\d+)/delete/$',
+        PaymentDeleteView.as_view(),
+        name='payslip_payment_delete',
+        ),
+
+    url(r'^payment-type/create/$',
+        PaymentTypeCreateView.as_view(),
+        name='payslip_payment_type_create',
+        ),
+
+    url(r'^payment-type/(?P<pk>\d+)/update/$',
+        PaymentTypeUpdateView.as_view(),
+        name='payslip_payment_type_update',
+        ),
+
+    url(r'^payment-type/(?P<pk>\d+)/delete/$',
+        PaymentTypeDeleteView.as_view(),
+        name='payslip_payment_type_delete',
         ),
 )

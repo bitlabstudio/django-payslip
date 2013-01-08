@@ -10,6 +10,8 @@ from payslip.tests.factories import (
     ExtraFieldFactory,
     ExtraFieldTypeFactory,
     ManagerFactory,
+    PaymentFactory,
+    PaymentTypeFactory,
     StaffFactory,
 )
 
@@ -70,7 +72,7 @@ class CompanyUpdateViewTestCase(ViewTestMixin, TestCase):
 
 
 class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
-    """Tests for the UpdateView ``CompanyDeleteView``."""
+    """Tests for the DeleteView ``CompanyDeleteView``."""
     longMessage = True
 
     def setUp(self):
@@ -88,7 +90,7 @@ class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
         self.user.is_staff = True
         self.user.save()
         self.should_be_callable_when_authenticated(self.user)
-        self.is_callable(method='POST', data={'name': 'Foo'}, user=self.user,
+        self.is_callable(method='POST', data={'delete': True}, user=self.user,
                          and_redirects_to=reverse('payslip_dashboard'))
 
 
@@ -162,7 +164,7 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
 
 
 class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
-    """Tests for the UpdateView ``EmployeeDeleteView``."""
+    """Tests for the DeleteView ``EmployeeDeleteView``."""
     longMessage = True
 
     def setUp(self):
@@ -177,7 +179,7 @@ class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
 
     def test_view(self):
         self.should_be_callable_when_authenticated(self.manager.user)
-        self.is_callable(method='POST', data={'name': 'Foo'},
+        self.is_callable(method='POST', data={'delete': True},
                          user=self.manager.user,
                          and_redirects_to=reverse('payslip_dashboard'))
 
@@ -222,7 +224,7 @@ class ExtraFieldUpdateViewTestCase(ViewTestMixin, TestCase):
 
 
 class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
-    """Tests for the UpdateView ``ExtraFieldDeleteView``."""
+    """Tests for the DeleteView ``ExtraFieldDeleteView``."""
     longMessage = True
 
     def setUp(self):
@@ -237,11 +239,7 @@ class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
 
     def test_view(self):
         self.should_be_callable_when_authenticated(self.staff)
-        data = {
-            'field_type': self.extra_field.field_type.id,
-            'value': 'Bar',
-        }
-        self.is_callable(method='POST', data=data, user=self.staff,
+        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
                          and_redirects_to=reverse('payslip_dashboard'))
 
 
@@ -280,7 +278,7 @@ class ExtraFieldTypeUpdateViewTestCase(ViewTestMixin, TestCase):
 
 
 class ExtraFieldTypeDeleteViewTestCase(ViewTestMixin, TestCase):
-    """Tests for the UpdateView ``ExtraFieldTypeDeleteView``."""
+    """Tests for the DeleteView ``ExtraFieldTypeDeleteView``."""
     longMessage = True
 
     def setUp(self):
@@ -295,5 +293,132 @@ class ExtraFieldTypeDeleteViewTestCase(ViewTestMixin, TestCase):
 
     def test_view(self):
         self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'name': 'Foo'}, user=self.staff,
+        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentCreateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the CreateView ``PaymentCreateView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.payment_type = PaymentTypeFactory()
+        self.employee = EmployeeFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_create'
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'payment_type': self.payment_type.id,
+            'employee': self.employee.id,
+            'amount': '1001.00',
+            'date': '2013-01-08 09:35:18',
+        }
+        self.is_callable(method='POST', data=data, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentUpdateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``PaymentUpdateView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.payment = PaymentFactory()
+        self.employee = EmployeeFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_update'
+
+    def get_view_kwargs(self):
+        return {'pk': self.payment.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'payment_type': self.payment.payment_type.id,
+            'employee': self.employee.id,
+            'amount': '1001.00',
+            'date': '2013-01-08 09:35:18',
+        }
+        self.is_callable(method='POST', data=data, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentDeleteViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the DeleteView ``PaymentDeleteView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.payment = PaymentFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_delete'
+
+    def get_view_kwargs(self):
+        return {'pk': self.payment.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentTypeCreateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the CreateView ``PaymentTypeCreateView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_type_create'
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentTypeUpdateViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the UpdateView ``PaymentTypeUpdateView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.payment_type = PaymentTypeFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_type_update'
+
+    def get_view_kwargs(self):
+        return {'pk': self.payment_type.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
+                         and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PaymentTypeDeleteViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the DeleteView ``PaymentTypeDeleteView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.payment_type = PaymentTypeFactory()
+
+    def get_view_name(self):
+        return 'payslip_payment_type_delete'
+
+    def get_view_kwargs(self):
+        return {'pk': self.payment_type.pk}
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
                          and_redirects_to=reverse('payslip_dashboard'))
