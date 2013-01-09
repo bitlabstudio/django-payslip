@@ -21,6 +21,7 @@ from payslip.views import (
     PaymentTypeCreateView,
     PaymentTypeDeleteView,
     PaymentTypeUpdateView,
+    PayslipGeneratorView,
 )
 
 
@@ -119,5 +120,10 @@ urlpatterns = patterns(
     url(r'^payment-type/(?P<pk>\d+)/delete/$',
         PaymentTypeDeleteView.as_view(),
         name='payslip_payment_type_delete',
+        ),
+
+    url(r'^payslip/$',
+        PayslipGeneratorView.as_view(),
+        name='payslip_generator',
         ),
 )

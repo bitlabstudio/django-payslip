@@ -1,16 +1,24 @@
 """Views for the ``online_docs`` app."""
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.db.models import Sum
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
     DeleteView,
+    FormView,
     TemplateView,
     UpdateView,
 )
 
-from payslip.forms import EmployeeForm, ExtraFieldForm, PaymentForm
+from dateutil import parser
+from payslip.forms import (
+    EmployeeForm,
+    ExtraFieldForm,
+    PaymentForm,
+    PayslipForm,
+)
 from payslip.models import (
     Company,
     Employee,
@@ -238,3 +246,50 @@ class PaymentUpdateView(CompanyPermissionMixin, PaymentMixin, UpdateView):
 class PaymentDeleteView(CompanyPermissionMixin, PaymentMixin, DeleteView):
     """Classic view to delete a payment."""
     pass
+
+
+class PayslipGeneratorView(CompanyPermissionMixin, FormView):
+    """View to present a small form to generate a custom payslip."""
+    template_name = 'payslip/payslip_form.html'
+    form_class = PayslipForm
+
+    def get_form_kwargs(self):
+        kwargs = super(PayslipGeneratorView, self).get_form_kwargs()
+        kwargs.update({'company': self.company})
+        return kwargs
+
+    def get_template_names(self):
+        if hasattr(self, 'post_data'):
+            return ['payslip/payslip.html']
+        return super(PayslipGeneratorView, self).get_template_names()
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PayslipGeneratorView, self).get_context_data(**kwargs)
+        if hasattr(self, 'post_data'):
+            employee = Employee.objects.get(pk=self.post_data.get('employee'))
+            date_start = parser.parse(self.post_data.get('date_start'))
+            date_end = parser.parse(self.post_data.get('date_end'))
+            payments_year = employee.payments.filter(
+                date__year=date_start.year)
+            payments = payments_year.filter(date__gte=date_start,
+                                            date__lte=date_end)
+            kwargs.update({
+                'employee': employee,
+                'date_start': date_start,
+                'date_end': date_end,
+                'payments': payments,
+                'payment_extra_fields': ExtraFieldType.objects.filter(
+                    model='Payment'),
+                'sum_year': payments_year.filter(amount__gt=0).aggregate(Sum(
+                    'amount')),
+                'sum_year_neg': payments_year.filter(amount__lt=0).aggregate(
+                    Sum('amount')),
+                'sum': payments.filter(amount__gt=0).aggregate(Sum('amount')),
+                'sum_neg': payments.filter(amount__lt=0).aggregate(
+                    Sum('amount')),
+            })
+        return kwargs
+
+    def form_valid(self, form):
+        self.post_data = self.request.POST
+        return self.render_to_response(self.get_context_data(form=form))

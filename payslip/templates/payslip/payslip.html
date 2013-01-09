@@ -1,0 +1,112 @@
+{% load i18n payslip_tags %}
+<!doctype html>
+
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>{% trans "Payslip" %}: {{ employee }} / {{ date_start }} - {{ date_end }}</title>
+
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <meta name="robots" content="index, follow" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/payslip.css" type="text/css" media="all">
+
+</head>
+<body>
+	<div id="payslipMenu">
+		<input type="submit" class="printButton" onclick="document.getElementById('payslipMenu').style.display = 'none'; window.print(); return false;" value="{% trans "Print now" %}" />
+	</div>
+	<div id="content" role="main">
+		<div class="container">
+			<div id="h1Wrapper">
+				<h1>{% trans "Payslip" %}</h1>
+				<span class="box">
+					<span class="boxHead">{% trans "Date" %}:</span><br />
+					<span class="boxContent">{% now "DATE_FORMAT" %}</span>
+				</span>
+				<span class="box">
+					<span class="boxHead">{% trans "Period" %}:</span><br />
+					<span class="boxContent">{{ date_start|date }} - {{ date_end|date }}</span>
+				</span>
+				<span class="box">
+					<span class="boxHead">{% trans "HR nr." %}:</span><br />
+					<span class="boxContent">{{ employee.hr_number }}</span>
+				</span>
+			</div>
+			<p class="subHead">{% trans "Considered as income receipt. Please store it carefully." %}</p>
+			<div id="address">
+				<p id="addressCompany">{{ employee.company }}, {{ employee.company.address }}</p>
+				<p id="addressEmployee">
+					{{ employee.get_title_display }}<br />
+					{{ employee }}<br />
+					{{ employee.address|linebreaksbr }}
+				</p>
+			</div>
+			<div id="employeeExtraFields">
+				{% for field in employee.extra_fields.all %}
+					{% if field.value %}
+						<span class="box">
+							<span class="boxHead">{{ field.field_type.name }}:</span><br />
+							<span class="boxContent">{{ field.value }}</span>
+						</span>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<h2>{% trans "Earnings / Deductions" %}</h2>
+			<table>
+				<thead>
+					<tr>
+						<th>{% trans "Payment type" %}</th>
+						{% for field_type in payment_extra_fields %}
+							<th>{{ field_type.name }}</th>
+						{% endfor %}
+						<th>{% trans "Amount" %}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for payment in payments %}
+						<tr>
+							<td>{{ payment.payment_type }}</td>
+							{% for field_type in payment_extra_fields %}
+								<td>{{ field_type|get_extra_field_value:payment }}</td>
+							{% endfor %}
+							<td>{{ payment.amount|floatformat:2 }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<p class="sum">{% trans "Sum earnings" %}: <strong>{{ sum.amount__sum|floatformat:2 }}</strong></p>
+			<p class="sum">{% trans "Sum deductions" %}: <strong>{{ sum_neg.amount__sum|floatformat:2 }}</strong></p>
+			<h2>{% trans "Period sum" %}</h2>
+			<span class="box">
+				<span class="boxHead">{% trans "Gross earnings" %}:</span><br />
+				<span class="boxContent">{{ sum.amount__sum|floatformat:2 }}</span>
+			</span>
+			<div id="payout">
+				<p>{% trans "Payout" %}:</p>
+				<p id="payoutCurrency">{% trans "EUR" %}</p>
+				<p id="payoutSum">{{ sum.amount__sum|add:sum_neg.amount__sum|floatformat:2 }}</p>
+			</div>
+			<div class="clear"></div>
+			<h2>{% trans "Year total" %}</h2>
+			<span class="box">
+				<span class="boxHead">{% trans "Gross total" %}:</span><br />
+				<span class="boxContent">{{ sum_year.amount__sum|floatformat:2 }}</span>
+			</span>
+			<span class="box">
+				<span class="boxHead">{% trans "Net total" %}:</span><br />
+				<span class="boxContent">{{ sum_year.amount__sum|add:sum_year_neg.amount__sum|floatformat:2 }}</span>
+			</span>
+		</div>
+	</div>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+</body>
+</html>

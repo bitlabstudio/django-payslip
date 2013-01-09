@@ -5,6 +5,7 @@
 <h1>{% trans "Payslip dashboard" %}</h1>
 
 <ul>
+    <li><a href="{% url "payslip_generator" %}">{% trans "Generate payslip" %}</a></li>
     <li><a href="{% url "payslip_extra_field_type_create" %}">{% trans "Create new extra field type" %}</a></li>
     <li><a href="{% url "payslip_extra_field_create" %}">{% trans "Create new extra field" %}</a></li>
     <li><a href="{% url "payslip_company_create" %}">{% trans "Create new company" %}</a></li>

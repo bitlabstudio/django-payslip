@@ -4,6 +4,7 @@ import md5
 from django.contrib.auth.models import make_password, User
 from django.db.models import Q
 from django import forms
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from payslip.models import (
@@ -75,6 +76,7 @@ class ExtraFieldFormMixin(object):
                     required=False, max_length=200)
 
     def save(self, *args, **kwargs):
+        resp = super(ExtraFieldFormMixin, self).save(*args, **kwargs)
         for extra_field_type in self.extra_field_types:
             try:
                 field_to_save = self.instance.extra_fields.get(
@@ -105,14 +107,11 @@ class ExtraFieldFormMixin(object):
                     )
                     new_field.save()
                     self.instance.extra_fields.add(new_field)
-        return super(ExtraFieldFormMixin, self).save(*args, **kwargs)
+        return resp
 
 
 class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
-    """
-    Form to create a new Employee instance.
-
-    """
+    """Form to create a new Employee instance."""
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
     email = forms.EmailField()
@@ -199,20 +198,14 @@ class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
 
 
 class PaymentForm(ExtraFieldFormMixin, forms.ModelForm):
-    """
-    Form to create a new Payment instance.
-
-    """
+    """Form to create a new Payment instance."""
     class Meta:
         model = Payment
         exclude = ('extra_fields')
 
 
 class ExtraFieldForm(forms.ModelForm):
-    """
-    Form to create a new ExtraField instance.
-
-    """
+    """Form to create a new ExtraField instance."""
     def __init__(self, *args, **kwargs):
         super(ExtraFieldForm, self).__init__(*args, **kwargs)
         self.fields['field_type'].queryset = ExtraFieldType.objects.filter(
@@ -220,3 +213,21 @@ class ExtraFieldForm(forms.ModelForm):
 
     class Meta:
         model = ExtraField
+
+
+class PayslipForm(forms.Form):
+    """Form to create a custom payslip."""
+    date_start = forms.DateField(initial=timezone.now().replace(day=1))
+    date_end = forms.DateField(initial=timezone.now().replace(
+        month=timezone.now().month+1, day=1) - timezone.timedelta(days=1))
+    employee = forms.ChoiceField()
+
+    def __init__(self, company, *args, **kwargs):
+        super(PayslipForm, self).__init__(*args, **kwargs)
+        self.company = company
+        if self.company:
+            self.fields['employee'].choices = [(
+                x.id, x) for x in self.company.employees.all()]
+        else:
+            self.fields['employee'].choices = [(
+                x.id, x) for x in Employee.objects.all()]

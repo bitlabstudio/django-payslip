@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block main %}
+<h1>{% trans "Generate a payslip" %}</h1>
+
+<form method="post" action=".">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="{% trans "Generate" %}" />
+</form>
+{% endblock %}

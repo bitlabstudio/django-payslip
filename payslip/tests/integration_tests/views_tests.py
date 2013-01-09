@@ -1,6 +1,8 @@
 """Tests for the views of the ``payslip`` app."""
 from django.core.urlresolvers import reverse
+from django.template.defaultfilters import date
 from django.test import TestCase
+from django.utils import timezone
 
 from django_libs.tests.factories import UserFactory
 from django_libs.tests.mixins import ViewTestMixin
@@ -422,3 +424,32 @@ class PaymentTypeDeleteViewTestCase(ViewTestMixin, TestCase):
         self.should_be_callable_when_authenticated(self.staff)
         self.is_callable(method='POST', data={'delete': True}, user=self.staff,
                          and_redirects_to=reverse('payslip_dashboard'))
+
+
+class PayslipGeneratorViewTestCase(ViewTestMixin, TestCase):
+    """Tests for the FormView ``PayslipGeneratorView``."""
+    longMessage = True
+
+    def setUp(self):
+        self.staff = StaffFactory()
+        self.manager = ManagerFactory()
+        self.employee = EmployeeFactory()
+        self.employee2 = EmployeeFactory(company=self.manager.company)
+
+    def get_view_name(self):
+        return 'payslip_generator'
+
+    def test_view(self):
+        self.should_be_callable_when_authenticated(self.staff)
+        data = {
+            'employee': self.employee.id,
+            'date_start': date(timezone.now().replace(day=1),
+                               'SHORT_DATE_FORMAT'),
+            'date_end': date(timezone.now().replace(
+                month=timezone.now().month+1, day=1) - timezone.timedelta(
+                    days=1), 'SHORT_DATE_FORMAT'),
+        }
+        self.is_callable(method='POST', data=data, user=self.staff)
+        data.update({'employee': self.employee2.id})
+        self.is_callable(method='POST', data=data, user=self.staff)
+        self.is_callable(method='POST', data=data, user=self.manager.user)
