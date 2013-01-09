@@ -1,3 +1,121 @@
+@media print {
+
+	@font-face {
+		font-family: Verdana;
+		src: url("verdana.ttf");
+	}
+
+	@font-face {
+		font-family: Verdana;
+		src: url("verdanab.ttf");
+		font-weight: bold;
+	}
+
+	@font-face {
+		font-family: Tahoma;
+		src: url("tahoma.ttf");
+	}
+
+	@font-face {
+		font-family: Tahoma;
+		src: url("tahomabd.ttf");
+		font-weight: bold;
+	}
+
+	@font-face {
+		font-family: "Trebuchet MS";
+		src: url("trebuc.ttf");
+	}
+
+	@font-face {
+		font-family: "Trebuchet MS";
+		src: url("trebucbd.ttf");
+		font-style: bold;
+	}
+
+	@font-face {
+		font-family: "DejaVu Sans", dejamono;
+		src: url(DejaVuSans.ttf);
+	}
+
+	@font-face {
+		font-family: "DejaVu Sans", dejamono;
+		src: url(DejaVuSans-Bold.ttf);
+		font-style: bold;
+	}
+
+	@font-face {
+		font-family: "Bitstream Vera Sans";
+		src: url("Vera.ttf");
+	}
+
+	@font-face {
+		font-family: "Bitstream Vera Sans";
+		src: url("VeraBd.ttf");
+		font-weight: bold;
+	}
+
+	@font-face {
+		font-family: "Courier New";
+		src: url("cour.ttf");
+	}
+
+	@font-face {
+		font-family: "Courier New";
+		src: url("courbd.ttf");
+		font-weight: bold;
+	}
+
+	@font-face {
+		font-family: Courier;
+		src: url("cour.fon");
+	}
+
+	@font-face {
+		font-family: "Lucida Sans Typewriter";
+		src: url("Ltype.ttf");
+	}
+
+	@font-face {
+		font-family: "Lucida Sans Typewriter";
+		src: url("Ltypebo.ttf");
+		font-weight: bold;
+	}
+
+	@page {
+
+		-pdf-page-orientation: portrait;
+		-pdf-page-size: a4;
+
+		margin-top: 2cm;
+		margin-left: 4cm;
+		margin-right: 2cm;
+		margin-bottom: 3cm;
+
+	}
+
+	@page regular {
+
+		-pdf-page-orientation: portrait;
+		-pdf-page-size: a4;
+
+		margin-top: 2cm;
+		margin-left: 4cm;
+		margin-right: 2cm;
+		margin-bottom: 3cm;
+
+		@frame footer {
+			-pdf-frame-content: footer;
+			bottom: 2cm;
+			left: 4cm;
+			right: 2cm;
+			height: 1cm;
+		}
+
+	}
+
+}
+
 body, html {
     font-family: Verdana, Tahoma, "Trebuchet MS", "DejuVu Sans", "Bitstream Vera Sans", sans-serif;
     color: black;
@@ -118,6 +236,14 @@ h2 {
     top: 0px;
     left: 0px;
     height: 30px;
+}
+
+#payslipMenu form {
+    display: inline;
+}
+
+#payslipMenu form>p {
+    display: none;
 }
 
 .printButton {

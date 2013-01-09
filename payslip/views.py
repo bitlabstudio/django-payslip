@@ -1,8 +1,10 @@
 """Views for the ``online_docs`` app."""
+import cStringIO as StringIO
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
@@ -27,6 +29,7 @@ from payslip.models import (
     Payment,
     PaymentType,
 )
+from xhtml2pdf import pisa
 
 
 #-------------#
@@ -292,4 +295,12 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
 
     def form_valid(self, form):
         self.post_data = self.request.POST
+        if 'download' in self.post_data:
+            result = StringIO.StringIO()
+            html = self.render_to_response(self.get_context_data(form=form))
+            pdf = pisa.CreatePDF(StringIO.StringIO(html.render().content),
+                                 result)
+            if not pdf.err:
+                return HttpResponse(result.getvalue(),
+                                    mimetype='application/pdf')
         return self.render_to_response(self.get_context_data(form=form))

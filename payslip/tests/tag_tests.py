@@ -1,18 +1,8 @@
 """Tests for the template filters and tags of the ``payslip`` app."""
 from django.test import TestCase
 
-from django_libs.tests.factories import UserFactory
 from payslip.templatetags.payslip_tags import get_extra_field_value
-from payslip.tests.factories import (
-    CompanyFactory,
-    EmployeeFactory,
-    ExtraFieldFactory,
-    ExtraFieldTypeFactory,
-    ManagerFactory,
-    PaymentFactory,
-    PaymentTypeFactory,
-    StaffFactory,
-)
+from payslip.tests.factories import ExtraFieldFactory, PaymentFactory
 
 
 class TemplateFilterTestCase(TestCase):
