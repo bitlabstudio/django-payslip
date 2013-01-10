@@ -1,15 +1,18 @@
 Django Payslip
 ==============
 
-A Django application for entering salary information of your employees so that
-they can review and print their monthly payslips.
+A reusable Django app that allows you to enter salary data of your employees
+so that authorized persons can view, print and export (PDF) their payslips.
 
 Installation
 ------------
 
 You need to install the following prerequisites in order to use this app::
 
-    pip install Django
+    pip install Django==1.4.3
+    pip install South==0.7.6
+    pip install python-dateutil==2.1
+    pip install xhtml2pdf==0.0.4
 
 If you want to install the latest stable release from PyPi::
 
@@ -33,6 +36,32 @@ Hook this app into your ``urls.py``::
         url(r'^payslip/$',
             include('payslip.urls')),
     )
+
+
+Features & Usage
+----------------
+
+You can:
+
+    * Define companies
+    * Assign employees (a user model is created automatically)
+    * Define payment types
+    * Create payments
+    * Create custom extra fields for COMPANIES, EMPLOYEES and PAYMENTS
+    * Create global attributes for those custom fields (dropdown fields)
+    * Generate custom payslips
+    * Print those payslips or export them as styled PDF documents
+
+There's already a print-ready template for your payslips, which should cover
+mainly used payslips. If you want to you can override the template with your
+own styles. Find it here `payslip/templates/payslip/payslip.html`.
+
+You can also create your own CSS, but be sure to cover print styles. Find it
+here `payslip/static/css/payslip.css`.
+
+After you have added the basic company information needed in your template, you
+can add payments and employees and start paysliping. :) Have fun with it.
+
 
 Contribute
 ----------
@@ -65,4 +94,6 @@ will just place an egg-link to your cloned fork in your project's virtualenv.
 Roadmap
 -------
 
-Check the issue tracker on github for milestones and features to come.
+* Add employee and manager dashboards
+
+Check the issue tracker on github for further milestones and features to come.

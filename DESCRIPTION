@@ -1,2 +1,2 @@
-A reusable Django app that allows you to enter salary data for your employees
-so that they can view and print their monthly payslips. 
+A reusable Django app that allows you to enter salary data of your employees
+so that authorized persons can view, print and export (PDF) their payslips.

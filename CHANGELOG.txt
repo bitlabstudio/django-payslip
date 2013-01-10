@@ -1,3 +1,7 @@
+=== 0.2 (ongoing) ===
+
+TODO: Add employee dasboard
+
 === 0.1 ===
 
 Initial commit
