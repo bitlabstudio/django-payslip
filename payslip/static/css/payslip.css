@@ -1,0 +1,263 @@
+@media print {
+	@page {
+
+		-pdf-page-orientation: portrait;
+		-pdf-page-size: a4;
+
+		margin-top: 2cm;
+		margin-left: 4cm;
+		margin-right: 2cm;
+		margin-bottom: 3cm;
+
+	}
+
+	@page regular {
+
+		-pdf-page-orientation: portrait;
+		-pdf-page-size: a4;
+
+		margin-top: 2cm;
+		margin-left: 4cm;
+		margin-right: 2cm;
+		margin-bottom: 3cm;
+
+		@frame footer {
+			-pdf-frame-content: footer;
+			bottom: 2cm;
+			left: 4cm;
+			right: 2cm;
+			height: 1cm;
+		}
+	}
+
+	html {
+		border: 1px none;
+		display: inline;
+		width: auto;
+		height: auto;
+		white-space: normal;
+	}
+
+	html, p, div, span, h1, h2, table, tr, th, td {
+		margin: 0;
+		padding: 0;
+	}
+
+	address, blockquote, body, center, dl, dir, div, fieldset, form, h1, h2, h3, h4, h5, h6, hr, isindex, menu, noframes, noscript, ol, p, pre, ul, li, dd, dt, pdftoc {
+		display: block;
+	}
+
+	h2 {
+		border-bottom: 1px solid #000000;
+	}
+
+	#payslipMenu {
+		display: none;
+	}
+
+	.tdMiddle {
+		width: 55%;
+	}
+
+	.tdMini {
+		width: 20%;
+	}
+
+	.tdSmall {
+		width: 30%;
+	}
+}
+
+@media screen {
+	body {
+		width: 210mm;
+		margin-top: 55px;
+		margin-bottom: 100px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	h1 {
+		width: 115mm;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	#payslipMenu {
+		position: fixed;
+		background: #000000;
+		padding: 5px 0;
+		width: 100%;
+		top: 0px;
+		left: 0px;
+		height: 27px;
+		border-bottom: 1px solid #ccc;
+		box-shadow: 0px 0px 30px #bbb;
+	}
+
+	#payslipMenu a {
+		color: #ffffff;
+	}
+
+	#payslipMenu form {
+		display: inline;
+	}
+
+	#payslipMenu form>p {
+		display: none;
+	}
+
+	.printButton {
+		margin-left: 20px;
+	}
+}
+
+html {
+    font-weight: normal;
+    color: #000000;
+    background-color: transparent;
+	line-height: 110%;
+    font-family: Verdana, Tahoma, "Trebuchet MS", "DejuVu Sans", "Bitstream Vera Sans", sans-serif;
+    font-size: 12px;
+}
+
+#address #addressEmployee, .box .boxContent, #payoutSum, #sum, .altFont {
+    font-family: "Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace;
+}
+
+#address {
+	width: 45%;
+}
+
+#addressCompany {
+    font-size: 70%;
+    padding: 5px 10px;
+	border: 1px solid #000000;
+	margin-right: 20px;
+}
+
+#addressEmployee {
+    padding: 12px;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+    font-weight: bold;
+	margin-right: 20px;
+}
+
+.box {
+    border: 1px solid #000000;
+	padding: 5px 10px 0px;
+	margin-right: 5px;
+}
+
+.box .boxContent {
+	white-space: nowrap;
+	font-size: 80%;
+}
+
+.box .boxHead {
+    font-size: 70%;
+	white-space: nowrap;
+}
+
+#employeeExtraFields {
+    width: 55%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight:bold;
+    -pdf-outline: true;
+    -pdf-outline-open: false;
+}
+
+h1 {
+    font-size:160%;
+    -pdf-outline-level: 0;
+}
+
+h2 {
+    font-size: 110%;
+	margin-top: 50px;
+	margin-bottom: 10px;
+    -pdf-outline-level: 1;
+	padding: 5px 5px 0px;
+	line-height: 140%;
+	background-color: #222222;
+	color: #ffffff;
+}
+
+h3 {
+    font-size:100%;
+    -pdf-outline-level: 2;
+}
+
+h4 {
+    -pdf-outline-level: 3;
+}
+
+h5 {
+    -pdf-outline-level: 4;
+}
+
+h6 {
+    -pdf-outline-level: 5;
+}
+
+#payout {
+    float: left;
+}
+
+#payoutHead {
+	text-align: right;
+	padding: 13px 10px 8px;
+}
+
+#payoutCurrency, #payoutSum, #payoutHead {
+    font-weight: bold;
+}
+
+#payoutCurrency, #payoutSum {
+    border-top: 3px solid #000000;
+	border-bottom: 3px solid #000000;
+	border-left: 1px solid #000000;
+	border-right: 1px solid #000000;
+	padding: 10px 10px 5px;
+}
+
+.subHead {
+    text-align: right;
+    font-weight: bold;
+    margin-top: 10px;
+	margin-bottom: 70px;
+}
+
+.sum {
+    font-size: 10px;
+    margin: 5px 9px 5px 0px;
+    float: left;
+}
+
+.sum strong {
+    font-size: 14px;
+}
+
+table, thead, tbody, tr {
+	width: 100%;
+}
+
+table tr {
+    padding-bottom: 5px;
+}
+
+td, th {
+	vertical-align: top;
+}
+
+th {
+    font-size: 90%;
+    text-align: left;
+	font-weight: bold;
+}

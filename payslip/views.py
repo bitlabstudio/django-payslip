@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -298,8 +299,9 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
         if 'download' in self.post_data:
             result = StringIO.StringIO()
             html = self.render_to_response(self.get_context_data(form=form))
-            pdf = pisa.CreatePDF(StringIO.StringIO(html.render().content),
-                                 result)
+            f = open('payslip/static/css/payslip.css')
+            pdf = pisa.CreatePDF(html.render().content, result, default_css=f.read())
+            f.close()
             if not pdf.err:
                 return HttpResponse(result.getvalue(),
                                     mimetype='application/pdf')
