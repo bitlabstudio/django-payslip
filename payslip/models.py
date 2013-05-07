@@ -206,6 +206,7 @@ class Payment(models.Model):
     :employee: Connection to the payment receiver.
     :amount: Current amount of the payment.
     :date: Date the payment should accrue.
+    :end_date: Optional end date, if payment type has a rrule.
     :extra_fields: Custom fields like e.g. quantity, bonus.
 
     """
@@ -230,6 +231,13 @@ class Payment(models.Model):
     date = models.DateTimeField(
         verbose_name=_('Date'),
         default=now(),
+    )
+
+    end_date = models.DateTimeField(
+        verbose_name=_('End of recurring period'),
+        blank=True, null=True,
+        help_text=_('This field is only considered, if the payment type has a'
+                    ' recurring rule.'),
     )
 
     extra_fields = models.ManyToManyField(

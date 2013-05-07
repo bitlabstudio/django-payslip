@@ -12,6 +12,10 @@ DATABASES = {
     }
 }
 
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
+
 ROOT_URLCONF = 'payslip.tests.urls'
 
 STATIC_URL = '/static/'

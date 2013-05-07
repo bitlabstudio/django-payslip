@@ -7,6 +7,8 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from dateutil.relativedelta import relativedelta
+
 from payslip.models import (
     Company,
     Employee,
@@ -217,9 +219,12 @@ class ExtraFieldForm(forms.ModelForm):
 
 class PayslipForm(forms.Form):
     """Form to create a custom payslip."""
-    date_start = forms.DateField(initial=timezone.now().replace(day=1))
+    # First day of the last month
+    date_start = forms.DateField(
+        initial=timezone.now().replace(day=1) - relativedelta(months=1))
+    # Last day of the last month
     date_end = forms.DateField(initial=timezone.now().replace(
-        month=timezone.now().month+1, day=1) - timezone.timedelta(days=1))
+        month=timezone.now().month, day=1) - timezone.timedelta(days=1))
     employee = forms.ChoiceField()
 
     def __init__(self, company, *args, **kwargs):
