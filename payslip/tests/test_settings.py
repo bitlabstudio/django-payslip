@@ -42,14 +42,15 @@ EXTERNAL_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
-    'django_libs',
 ]
 
 INTERNAL_APPS = [
-    'django_nose',
+    'payslip.tests.test_app',
     'payslip',
 ]
 
 INSTALLED_APPS = EXTERNAL_APPS + INTERNAL_APPS
 
 COVERAGE_MODULE_EXCLUDES += EXTERNAL_APPS
+
+SECRET_KEY = 'foobar'

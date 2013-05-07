@@ -1,10 +1,10 @@
-{% extends "base.html"  %}
+{% extends "payslip/payslip_base.html"  %}
 {% load i18n %}
 {% load url from future %}
 
-{% block main %}
-<h1>{% trans "Payslip dashboard" %}</h1>
+{% block head %}<h1>{% trans "Payslip dashboard" %}</h1>{% endblock %}
 
+{% block content %}
 <ul>
     <li><a href="{% url "payslip_generator" %}">{% trans "Generate payslip" %}</a></li>
     <li><a href="{% url "payslip_extra_field_type_create" %}">{% trans "Create new extra field type" %}</a></li>

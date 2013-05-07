@@ -57,7 +57,7 @@ mainly used payslips. If you want to you can override the template with your
 own styles. Find it here ``payslip/templates/payslip/payslip.html``.
 
 You can also create your own CSS, but be sure to cover print styles. Find it
-here ``payslip/static/css/payslip.css``.
+here ``static/payslip/css/payslip.css``.
 
 After you have added the basic company information needed in your template, you
 can add payments and employees and start paysliping. :) Have fun with it.

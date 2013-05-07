@@ -1,10 +1,9 @@
-{% extends "base.html"  %}
+{% extends "payslip/payslip_base.html"  %}
 {% load i18n %}
-{% load url from future %}
 
-{% block main %}
-<h1>{% trans "Generate a payslip" %}</h1>
+{% block head %}<h1>{% trans "Generate a payslip" %}</h1>{% endblock %}
 
+{% block content %}
 <form method="post" action=".">
     {{ form.non_field_errors }}
     {% csrf_token %}

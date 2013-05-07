@@ -452,4 +452,5 @@ class PayslipGeneratorViewTestCase(ViewTestMixin, TestCase):
         self.is_callable(method='POST', data=data, user=self.staff)
         data.update({'employee': self.employee2.id})
         self.is_callable(method='POST', data=data, user=self.staff)
+        data.update({'download': True})
         self.is_callable(method='POST', data=data, user=self.manager.user)

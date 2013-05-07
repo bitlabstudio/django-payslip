@@ -3,19 +3,21 @@
 # ===========================================================================
 # Packages essential to this app. Needed by anyone who wants to use this app.
 # ===========================================================================
-Django==1.4.3
+Django==1.5.1
 South==0.7.6
 python-dateutil==2.1
-xhtml2pdf==0.0.4
+xhtml2pdf==0.0.5
 
 
 # ==============================================================
 # Packages needed for running the tests. Needed by contributors.
 # ==============================================================
-mock
-django-nose
-coverage
-django-coverage
-selenium
-factory_boy==1.2.0
--e git+git://github.com/bitmazk/django-libs.git@8a72ac99ddc27dff22fb06a528db6c81c84b212a#egg=django_libs
+mock==1.0.1
+django-nose==1.1
+coverage==3.6
+django-coverage==1.2.2
+django-nose==1.1
+factory-boy==1.2.0
+django-libs==1.4.6
+ipdb==0.7
+flake8==2.0

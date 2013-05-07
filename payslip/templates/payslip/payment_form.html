@@ -1,14 +1,15 @@
-{% extends "base.html"  %}
+{% extends "payslip/payslip_base.html"  %}
 {% load i18n %}
-{% load url from future %}
 
-{% block main %}
+{% block head %}
 {% if not form.instance.id %}
     <h1>{% trans "Create a new payment" %}</h1>
 {% else %}
     <h1>{{ object }}</h1>
 {% endif %}
+{% endblock %}
 
+{% block content %}
 <form method="post" action=".">
     {{ form.non_field_errors }}
     {% csrf_token %}
