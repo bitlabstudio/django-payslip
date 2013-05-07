@@ -23,13 +23,13 @@
 </head>
 <body>
 	<div id="payslipMenu">
-		<input type="submit" class="printButton" onclick="window.print(); return false;" value="{% trans "Print now" %}" />
+		<input type="submit" class="printButton" value="{% trans "Print now" %}" />
 		<form action="." method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			{{ form.as_p }}
             <input type="submit" name="download" value="{% trans "Get PDF" %}" />
 		</form>
-		<a href="{% url "payslip_generator" %}">{% trans "Clear form" %}</a>
+		<a href="{% url "payslip_generator" %}">{% trans "Clear payslip" %}</a>
 	</div>
 	<table>
 		<tbody>
@@ -161,5 +161,6 @@
 		</tbody>
 	</table>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="{{ STATIC_URL }}payslip/js/payslip.js"></script>
 </body>
 </html>
