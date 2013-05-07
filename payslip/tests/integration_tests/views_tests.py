@@ -433,8 +433,15 @@ class PayslipGeneratorViewTestCase(ViewTestMixin, TestCase):
     def setUp(self):
         self.staff = StaffFactory()
         self.manager = ManagerFactory()
-        self.employee = EmployeeFactory()
+        # Fixtures to test all context functions
+        self.payment = PaymentFactory(payment_type__rrule='MONTHLY')
+        self.employee = self.payment.employee
         self.employee2 = EmployeeFactory(company=self.manager.company)
+        PaymentFactory(payment_type__rrule='MONTHLY', employee=self.employee,
+                       date=timezone.now() - timezone.timedelta(days=365))
+        PaymentFactory(payment_type__rrule='MONTHLY', employee=self.employee,
+                       end_date=timezone.now() - timezone.timedelta(days=1),
+                       amount=-100)
 
     def get_view_name(self):
         return 'payslip_generator'

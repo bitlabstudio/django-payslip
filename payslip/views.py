@@ -4,7 +4,7 @@ import os
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import (
@@ -15,7 +15,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from dateutil import parser
+from dateutil import parser, rrule
 from xhtml2pdf import pisa
 
 from .app_settings import CURRENCY
@@ -272,13 +272,79 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
     def get_context_data(self, **kwargs):
         kwargs = super(PayslipGeneratorView, self).get_context_data(**kwargs)
         if hasattr(self, 'post_data'):
+            # Get form data
             employee = Employee.objects.get(pk=self.post_data.get('employee'))
             date_start = parser.parse(self.post_data.get('date_start'))
             date_end = parser.parse(self.post_data.get('date_end'))
+
+            # Get payments for the selected year
             payments_year = employee.payments.filter(
-                date__year=date_start.year)
-            payments = payments_year.filter(date__gte=date_start,
-                                            date__lte=date_end)
+                # Single payments in this year
+                Q(date__year=date_start.year, payment_type__rrule__exact='') |
+                # Recurring payments with past date and end_date in the
+                # selected year or later
+                Q(date__lte=date_end, end_date__gte=parser.parse(
+                    '{0}0101T000000'.format(date_start.year)),
+                  payment_type__rrule__isnull=False) |
+                # Recurring payments with past date in period and open end
+                Q(date__lte=date_end, end_date__isnull=True,
+                  payment_type__rrule__isnull=False)
+            )
+            # Get payments for the selected period
+            payments = payments_year.filter(
+                # Single payments in the selected period
+                Q(date__gte=date_start, date__lte=date_end,
+                  payment_type__rrule__exact='') |
+                # Recurring payments with past date and end_date in the period
+                Q(end_date__lte=date_end, end_date__gte=date_start,
+                  date__lte=date_end, payment_type__rrule__isnull=False) |
+                # Recurring payments with past date in period and open end
+                Q(date__lte=date_end, end_date__isnull=True,
+                  payment_type__rrule__isnull=False)
+            )
+
+            # Yearly positive summary
+            sum_year = payments_year.filter(
+                amount__gt=0, payment_type__rrule__exact='').aggregate(
+                    Sum('amount')).get('amount__sum') or 0
+
+            # Yearly negative summary
+            sum_year_neg = payments_year.filter(
+                amount__lt=0, payment_type__rrule__exact='').aggregate(
+                    Sum('amount')).get('amount__sum') or 0
+
+            # Yearly summary of recurring payments
+            for payment in payments_year.exclude(
+                    payment_type__rrule__exact=''):
+                # If the recurring payment started in a year before, let's take
+                # January 1st as a start, otherwise take the original date
+                if payment.date.year < date_start.year:
+                    start = parser.parse('{0}0101T000000'.format(
+                        date_start.year))
+                else:
+                    start = payment.date
+                # If the payments ends before the period's end date, let's take
+                # this date, otherwise we can take the period's end
+                if payment.end_date and payment.end_date < date_end:
+                    end = payment.end_date
+                else:
+                    end = date_end
+                recurrings = rrule.rrule(
+                    rrule._rrulestr._freq_map.get(payment.payment_type.rrule),
+                    dtstart=start, until=end,
+                )
+                # Multiply amount with recurrings
+                if payment.amount > 0:
+                    sum_year += payment.amount * recurrings.count()
+                else:
+                    sum_year_neg += payment.amount * recurrings.count()
+
+            # Period summaries
+            sum = payments.filter(amount__gt=0).aggregate(
+                Sum('amount')).get('amount__sum') or 0
+            sum_neg = payments.filter(amount__lt=0).aggregate(
+                Sum('amount')).get('amount__sum') or 0
+
             kwargs.update({
                 'employee': employee,
                 'date_start': date_start,
@@ -286,13 +352,10 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 'payments': payments,
                 'payment_extra_fields': ExtraFieldType.objects.filter(
                     model='Payment'),
-                'sum_year': payments_year.filter(amount__gt=0).aggregate(Sum(
-                    'amount')),
-                'sum_year_neg': payments_year.filter(amount__lt=0).aggregate(
-                    Sum('amount')),
-                'sum': payments.filter(amount__gt=0).aggregate(Sum('amount')),
-                'sum_neg': payments.filter(amount__lt=0).aggregate(
-                    Sum('amount')),
+                'sum_year': sum_year,
+                'sum_year_neg': sum_year + sum_year_neg,
+                'sum': sum,
+                'sum_neg': sum_neg,
                 'currency': CURRENCY,
             })
         return kwargs

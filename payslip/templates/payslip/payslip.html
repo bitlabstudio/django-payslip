@@ -93,30 +93,32 @@
 		</tbody>
 	</table>
 	<h2>{% trans "Earnings / Deductions" %}</h2>
-	<table>
-		<thead>
-			<tr>
-				<th>{% trans "Payment type" %}</th>
-				{% for field_type in payment_extra_fields %}
-					<th>{{ field_type.name }}</th>
-				{% endfor %}
-				<th>{% trans "Amount" %}</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for payment in payments %}
-				<tr class="altFont">
-					<td>{{ payment.payment_type }}</td>
+	{% if payments %}
+		<table>
+			<thead>
+				<tr>
+					<th>{% trans "Payment type" %}</th>
 					{% for field_type in payment_extra_fields %}
-						<td>{{ field_type|get_extra_field_value:payment }}</td>
+						<th>{{ field_type.name }}</th>
 					{% endfor %}
-					<td>{{ payment.amount|floatformat:2 }}</td>
+					<th>{% trans "Amount" %}</th>
 				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	<p class="sum">{% trans "Sum earnings" %}: <strong>{{ sum.amount__sum|floatformat:2 }}</strong></p>
-	<p class="sum">{% trans "Sum deductions" %}: <strong>{{ sum_neg.amount__sum|floatformat:2 }}</strong></p>
+			</thead>
+			<tbody>
+				{% for payment in payments %}
+					<tr class="altFont">
+						<td>{{ payment.payment_type.name }}</td>
+						{% for field_type in payment_extra_fields %}
+							<td>{{ field_type|get_extra_field_value:payment }}</td>
+						{% endfor %}
+						<td>{{ payment.amount|floatformat:2 }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %}
+	<p class="sum">{% trans "Sum earnings" %}: <strong>{{ sum|floatformat:2 }}</strong></p>
+	<p class="sum">{% trans "Sum deductions" %}: <strong>{{ sum_neg|floatformat:2 }}</strong></p>
 	<h2>{% trans "Period sum" %}</h2>
 	<table>
 		<tbody>
@@ -124,7 +126,7 @@
 				<td class="tdSmall">
 					<p class="box">
 						<span class="boxHead">{% trans "Gross earnings" %}:</span><br />
-						<span class="boxContent">{{ sum.amount__sum|floatformat:2 }}</span>
+						<span class="boxContent">{{ sum|floatformat:2 }}</span>
 					</p>
 				</td>
 				<td>
@@ -134,7 +136,7 @@
 					<p id="payoutCurrency">{{ currency }}</p>
 				</td>
 				<td class="tdSmall">
-					<p id="payoutSum">{{ sum.amount__sum|add:sum_neg.amount__sum|floatformat:2 }}</p>
+					<p id="payoutSum">{{ sum|add:sum_neg|floatformat:2 }}</p>
 				</td>
 			</tr>
 		</tbody>
@@ -146,13 +148,13 @@
 				<td class="tdMini">
 					<p class="box">
 						<span class="boxHead">{% trans "Gross total" %}:</span><br />
-						<span class="boxContent">{{ sum_year.amount__sum|floatformat:2 }}</span>
+						<span class="boxContent">{{ sum_year|floatformat:2 }}</span>
 					</p>
 				</td>
 				<td class="tdMini">
 					<p class="box">
 						<span class="boxHead">{% trans "Net total" %}:</span><br />
-						<span class="boxContent">{{ sum_year.amount__sum|add:sum_year_neg.amount__sum|floatformat:2 }}</span>
+						<span class="boxContent">{{ sum_year_neg|floatformat:2 }}</span>
 					</p>
 				</td>
 			</tr>
