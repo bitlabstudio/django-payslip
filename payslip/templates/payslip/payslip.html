@@ -131,7 +131,7 @@
 					<p id="payoutHead">{% trans "Payout" %}:</p>
 				</td>
 				<td class="tdMini">
-					<p id="payoutCurrency">{% trans "EUR" %}</p>
+					<p id="payoutCurrency">{{ currency }}</p>
 				</td>
 				<td class="tdSmall">
 					<p id="payoutSum">{{ sum.amount__sum|add:sum_neg.amount__sum|floatformat:2 }}</p>

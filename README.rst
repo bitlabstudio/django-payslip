@@ -63,6 +63,17 @@ After you have added the basic company information needed in your template, you
 can add payments and employees and start paysliping. :) Have fun with it.
 
 
+Settings
+--------
+
+PAYSLIP_CURRENCY
+++++++++++++++++
+
+Default: 'EUR'
+
+Your preferred currency acronym.
+
+
 Contribute
 ----------
 

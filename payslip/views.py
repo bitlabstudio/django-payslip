@@ -16,13 +16,16 @@ from django.views.generic import (
 )
 
 from dateutil import parser
-from payslip.forms import (
+from xhtml2pdf import pisa
+
+from .app_settings import CURRENCY
+from .forms import (
     EmployeeForm,
     ExtraFieldForm,
     PaymentForm,
     PayslipForm,
 )
-from payslip.models import (
+from .models import (
     Company,
     Employee,
     ExtraField,
@@ -30,7 +33,6 @@ from payslip.models import (
     Payment,
     PaymentType,
 )
-from xhtml2pdf import pisa
 
 
 #-------------#
@@ -291,6 +293,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 'sum': payments.filter(amount__gt=0).aggregate(Sum('amount')),
                 'sum_neg': payments.filter(amount__lt=0).aggregate(
                     Sum('amount')),
+                'currency': CURRENCY,
             })
         return kwargs
 
