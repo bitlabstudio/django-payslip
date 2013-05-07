@@ -167,12 +167,23 @@ class PaymentType(models.Model):
     Model to create payment types.
 
     :name: Name of the type.
+    :rrule: Recurring rule setting.
     :description: Description of the type.
 
     """
     name = models.CharField(
         max_length=100,
         verbose_name=_('Name'),
+    )
+
+    rrule = models.CharField(
+        max_length=10,
+        verbose_name=_('Recurring rule'),
+        blank=True,
+        choices=(
+            ('MONTHLY', _('Monthly')),
+            ('YEARLY', _('Yearly')),
+        )
     )
 
     description = models.CharField(
@@ -182,6 +193,8 @@ class PaymentType(models.Model):
     )
 
     def __unicode__(self):
+        if self.rrule:
+            return '{0} ({1})'.format(self.name, self.get_rrule_display())
         return '{0}'.format(self.name)
 
 
@@ -232,4 +245,5 @@ class Payment(models.Model):
     )
 
     def __unicode__(self):
-        return '{0} - {1}'.format(self.payment_type, self.amount)
+        return '{0} - {1} ({2})'.format(self.payment_type, self.amount,
+                                        self.employee)

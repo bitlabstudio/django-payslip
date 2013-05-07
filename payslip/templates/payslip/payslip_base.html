@@ -1,6 +1,9 @@
 {% extends "base.html"  %}
+{% load i18n %}
+{% load url from future %}
 
 {% block main %}
+    {% block backlink %}<a href="{% url "payslip_dashboard" %}">&laquo; {% trans "back to dashboard" %}</a>{% endblock %}
     {% block head %}{% endblock %}
     {% block content %}{% endblock %}
 {% endblock %}
