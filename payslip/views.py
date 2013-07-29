@@ -296,7 +296,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 Q(date__gte=date_start, date__lte=date_end,
                   payment_type__rrule__exact='') |
                 # Recurring payments with past date and end_date in the period
-                Q(end_date__lte=date_end, end_date__gte=date_start,
+                Q(end_date__gte=date_end,
                   date__lte=date_end, payment_type__rrule__isnull=False) |
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
