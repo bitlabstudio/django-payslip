@@ -9,10 +9,10 @@ Installation
 
 You need to install the following prerequisites in order to use this app::
 
-    pip install Django==1.4.3
-    pip install South==0.7.6
-    pip install python-dateutil==2.1
-    pip install xhtml2pdf==0.0.4
+    pip install Django
+    pip install South
+    pip install python-dateutil
+    pip install xhtml2pdf
 
 If you want to install the latest stable release from PyPi::
 
@@ -33,8 +33,7 @@ Hook this app into your ``urls.py``::
 
     urlpatterns = patterns('',
         ...
-        url(r'^payslip/$',
-            include('payslip.urls')),
+        url(r'^payslip/', include('payslip.urls')),
     )
 
 

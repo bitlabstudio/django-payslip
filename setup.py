@@ -23,6 +23,10 @@ setup(
     url="https://github.com/bitmazk/django-payslip",
     packages=find_packages(),
     include_package_data=True,
+    install_requires=[
+        'django',
+        'xhtml2pdf',
+    ],
     tests_require=[
         'fabric',
         'factory_boy',
