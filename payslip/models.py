@@ -230,7 +230,7 @@ class Payment(models.Model):
 
     date = models.DateTimeField(
         verbose_name=_('Date'),
-        default=now(),
+        default=now().today(),
     )
 
     end_date = models.DateTimeField(

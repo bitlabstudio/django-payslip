@@ -1,9 +1,53 @@
-{% extends "base.html"  %}
-{% load i18n %}
-{% load url from future %}
+{% load i18n static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block head_title %}Payslip{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="msapplication-config" content="none"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+	<link href="{% static "payslip/css/base.css" %}" media="all" rel="stylesheet" type="text/css" />
+    {% block extrahead %}{% endblock %}
 
-{% block main %}
-    {% block backlink %}<a href="{% url "payslip_dashboard" %}">&laquo; {% trans "back to dashboard" %}</a>{% endblock %}
-    {% block head %}{% endblock %}
-    {% block content %}{% endblock %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}">
+</head>
+<body>
+<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav" role="banner">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+                <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{% url "payslip_dashboard" %}" class="navbar-brand">Payslip</a>
+        </div>
+        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="{% url "payslip_dashboard" %}">{% trans "Dashboard" %}</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+{% block main_container %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            {% block main %}
+				{% block backlink %}<a href="{% url "payslip_dashboard" %}">&laquo; {% trans "back to dashboard" %}</a>{% endblock %}
+				{% block head %}{% endblock %}
+				{% block content %}{% endblock %}
+			{% endblock %}
+        </div>
+    </div>
+</div>
 {% endblock %}
+</body>
+</html>

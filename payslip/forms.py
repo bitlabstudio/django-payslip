@@ -163,7 +163,7 @@ class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
 
         """
         data = self.cleaned_data
-        if not 'email' in data:
+        if 'email' not in data:
             return data
         if ('password' in data and 'retype_password' in data):
             if data['password'] != data['retype_password']:
@@ -196,14 +196,15 @@ class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
 
     class Meta:
         model = Employee
-        exclude = ('user', 'extra_fields')
+        fields = ('company', 'hr_number', 'address', 'title', 'is_manager')
 
 
 class PaymentForm(ExtraFieldFormMixin, forms.ModelForm):
     """Form to create a new Payment instance."""
     class Meta:
         model = Payment
-        exclude = ('extra_fields')
+        fields = ('payment_type', 'employee', 'amount', 'date', 'end_date',
+                  'description')
 
 
 class ExtraFieldForm(forms.ModelForm):

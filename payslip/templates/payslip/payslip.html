@@ -1,5 +1,4 @@
-{% load i18n payslip_tags %}
-{% load url from future %}
+{% load i18n payslip_tags static %}
 <!DOCTYPE html>
 
 <!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
@@ -18,7 +17,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-	<link href="{{ STATIC_URL }}payslip/css/payslip.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="{% static "payslip/css/payslip.css" %}" media="all" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
@@ -101,6 +100,7 @@
 					{% for field_type in payment_extra_fields %}
 						<th>{{ field_type.name }}</th>
 					{% endfor %}
+					<th>{% trans "Month" %}</th>
 					<th>{% trans "Amount" %}</th>
 				</tr>
 			</thead>
@@ -111,6 +111,7 @@
 						{% for field_type in payment_extra_fields %}
 							<td>{{ field_type|get_extra_field_value:payment }}</td>
 						{% endfor %}
+						<td>{{ payment.date|date:"M Y" }}</td>
 						<td>{{ payment.amount|floatformat:2 }}</td>
 					</tr>
 				{% endfor %}
@@ -141,7 +142,7 @@
 			</tr>
 		</tbody>
 	</table>
-	<h2>{% trans "Year total" %}</h2>
+	<h2>{% blocktrans with date=date_end|date %}Year total <small>(until {{ date }})</small>{% endblocktrans %}</h2>
 	<table>
 		<tbody>
 			<tr>
@@ -161,6 +162,6 @@
 		</tbody>
 	</table>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-	<script src="{{ STATIC_URL }}payslip/js/payslip.js"></script>
+	<script src="{% static "payslip/js/payslip.js" %}"></script>
 </body>
 </html>

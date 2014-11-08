@@ -1,5 +1,9 @@
 """Settings that need to be set in order to run the tests."""
+import logging
 import os
+
+
+logging.getLogger("factory").setLevel(logging.WARN)
 
 DEBUG = True
 
@@ -48,6 +52,7 @@ EXTERNAL_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django.contrib.sites',
+    'django_libs',
 ]
 
 INTERNAL_APPS = [

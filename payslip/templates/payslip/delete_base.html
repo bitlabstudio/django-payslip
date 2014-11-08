@@ -4,9 +4,13 @@
 {% block head %}<h1>{{ object }}</h1>{% endblock %}
 
 {% block content %}
-<form method="post" action=".">
-    {% csrf_token %}
-    {% block text %}<p>{% trans "Are you sure that you want to delete this object?" %}</p>{% endblock %}
-    <input type="submit" value="{% trans "Delete" %}" />
-</form>
+<div class="row">
+    <div class="col-md-6">
+        <form class="horizontal" method="post" action=".">
+            {% include "django_libs/partials/form.html" with horizontal=1 %}
+            {% block text %}<p>{% trans "Are you sure that you want to delete this object?" %}</p>{% endblock %}
+            <input class="btn btn-default" type="submit" value="{% trans "Delete" %}" />
+        </form>
+    </div>
+</div>
 {% endblock %}

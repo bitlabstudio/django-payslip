@@ -22,14 +22,14 @@ class StaffFactory(UserFactory):
     is_staff = True
 
 
-class CompanyFactory(factory.Factory):
+class CompanyFactory(factory.DjangoModelFactory):
     """Factory for the model ``Company``."""
     FACTORY_FOR = Company
 
     name = 'Test Company'
 
 
-class EmployeeFactory(factory.Factory):
+class EmployeeFactory(factory.DjangoModelFactory):
     """Factory for the model ``Employee``."""
     FACTORY_FOR = Employee
 
@@ -38,7 +38,7 @@ class EmployeeFactory(factory.Factory):
     title = 0
 
 
-class ManagerFactory(factory.Factory):
+class ManagerFactory(factory.DjangoModelFactory):
     """Factory for the model ``Employee`` with extra permission."""
     FACTORY_FOR = Employee
 
@@ -48,7 +48,7 @@ class ManagerFactory(factory.Factory):
     is_manager = True
 
 
-class ExtraFieldTypeFactory(factory.Factory):
+class ExtraFieldTypeFactory(factory.DjangoModelFactory):
     """Factory for the model ``ExtraFieldType``."""
     FACTORY_FOR = ExtraFieldType
 
@@ -57,7 +57,7 @@ class ExtraFieldTypeFactory(factory.Factory):
     model = 'Employee'
 
 
-class ExtraFieldFactory(factory.Factory):
+class ExtraFieldFactory(factory.DjangoModelFactory):
     """Factory for the model ``ExtraField``."""
     FACTORY_FOR = ExtraField
 
@@ -65,14 +65,14 @@ class ExtraFieldFactory(factory.Factory):
     value = 'Foo'
 
 
-class PaymentTypeFactory(factory.Factory):
+class PaymentTypeFactory(factory.DjangoModelFactory):
     """Factory for the model ``PaymentType``."""
     FACTORY_FOR = PaymentType
 
     name = 'Foo'
 
 
-class PaymentFactory(factory.Factory):
+class PaymentFactory(factory.DjangoModelFactory):
     """Factory for the model ``Payment``."""
     FACTORY_FOR = Payment
 

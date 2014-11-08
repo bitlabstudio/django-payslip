@@ -4,10 +4,12 @@
 {% block head %}<h1>{% trans "Generate a payslip" %}</h1>{% endblock %}
 
 {% block content %}
-<form method="post" action=".">
-    {{ form.non_field_errors }}
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="{% trans "Generate" %}" />
-</form>
+<div class="row">
+    <div class="col-md-6">
+        <form class="horizontal" method="post" action=".">
+            {% include "django_libs/partials/form.html" with horizontal=1 %}
+            <input class="btn btn-default" type="submit" value="{% trans "Generate" %}" />
+        </form>
+    </div>
+</div>
 {% endblock %}

@@ -35,9 +35,9 @@ from .models import (
 )
 
 
-#-------------#
-# Mixins      #
-#-------------#
+# -------------#
+# Mixins       #
+# -------------#
 
 class PermissionMixin(object):
     """Mixin to handle security functions."""
@@ -135,9 +135,9 @@ class PaymentTypeMixin(object):
     model = PaymentType
 
 
-#-------------#
-# Views       #
-#-------------#
+# -------------#
+# Views        #
+# -------------#
 
 class DashboardView(PermissionMixin, TemplateView):
     """Dashboard to navigate through the payslip app."""

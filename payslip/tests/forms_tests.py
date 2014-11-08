@@ -21,7 +21,7 @@ class EmployeeFormTestCase(TestCase):
             'title': '1',
         }
         form = forms.EmployeeForm(company=manager.company, data=data)
-        self.assertTrue(form.is_valid())
+        self.assertFalse(form.errors)
         form.save()
         form = forms.EmployeeForm(company=manager.company, data=data)
         self.assertFalse(form.is_valid())
