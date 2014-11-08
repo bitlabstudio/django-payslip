@@ -1,6 +1,7 @@
-=== 0.2 (ongoing) ===
+=== 0.1.X (ongoing) ===
 
 TODO: Add employee dasboard
+- updated requirements and templates
 
 === 0.1 ===
 
