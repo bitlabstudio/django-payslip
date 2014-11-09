@@ -111,7 +111,7 @@
 						{% for field_type in payment_extra_fields %}
 							<td>{{ field_type|get_extra_field_value:payment }}</td>
 						{% endfor %}
-						<td>{{ payment.date|date:"M Y" }}</td>
+						<td>{% if payment.is_recurring %}{{ date_end|date:"M Y" }}{% else %}{{ payment.date|date:"M Y" }}{% endif %}</td>
 						<td>{{ payment.amount|floatformat:2 }}</td>
 					</tr>
 				{% endfor %}

@@ -1,7 +1,6 @@
 """Views for the ``online_docs`` app."""
 import cStringIO as StringIO
 import os
-import pytz
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -275,36 +274,34 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
         if hasattr(self, 'post_data'):
             # Get form data
             employee = Employee.objects.get(pk=self.post_data.get('employee'))
-            date_start = parser.parse(
-                self.post_data.get('date_start')).replace(tzinfo=pytz.UTC)
-            date_end = parser.parse(
-                self.post_data.get('date_end')).replace(tzinfo=pytz.UTC)
+            date_start = parser.parse(self.post_data.get('date_start'))
+            date_end = parser.parse(self.post_data.get('date_end'))
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
                 # Single payments in this year
-                Q(date__year=date_start.year, payment_type__rrule__exact='') |
+                Q(date__year=date_start.year,
+                  payment_type__rrule__isnull=True) |
                 # Recurring payments with past date and end_date in the
                 # selected year or later
                 Q(date__lte=date_end, end_date__gte=parser.parse(
-                    '{0}0101T000000'.format(date_start.year)).replace(
-                        tzinfo=pytz.UTC),
+                    '{0}0101T000000'.format(date_start.year)),
                   payment_type__rrule__isnull=False) |
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
                   payment_type__rrule__isnull=False)
             )
             # Get payments for the selected period
-            payments = payments_year.filter(
-                # Single payments in the selected period
-                Q(date__gte=date_start, date__lte=date_end,
-                  payment_type__rrule__exact='') |
+            payments = payments_year.exclude(
+                # Exclude single payments not transferred in the period
+                Q(date__lt=date_start) |
+                Q(date__gt=date_end),
+                Q(payment_type__rrule__exact=''),
+            ).filter(
                 # Recurring payments with past date and end_date in the period
-                Q(end_date__gte=date_end,
-                  date__lte=date_end, payment_type__rrule__isnull=False) |
+                Q(end_date__gte=date_end, date__lte=date_end) |
                 # Recurring payments with past date in period and open end
-                Q(date__lte=date_end, end_date__isnull=True,
-                  payment_type__rrule__isnull=False)
+                Q(date__lte=date_end, end_date__isnull=True)
             )
 
             # Yearly positive summary
@@ -322,15 +319,16 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                     payment_type__rrule__exact=''):
                 # If the recurring payment started in a year before, let's take
                 # January 1st as a start, otherwise take the original date
-                if payment.date.year < date_start.year:
+                if payment.get_date_without_tz().year < date_start.year:
                     start = parser.parse('{0}0101T000000'.format(
-                        date_start.year)).replace(tzinfo=pytz.UTC)
+                        date_start.year))
                 else:
-                    start = payment.date
+                    start = payment.get_date_without_tz()
                 # If the payments ends before the period's end date, let's take
                 # this date, otherwise we can take the period's end
-                if payment.end_date and payment.end_date < date_end:
-                    end = payment.end_date
+                if (payment.end_date
+                        and payment.get_end_date_without_tz() < date_end):
+                    end = payment.get_end_date_without_tz()
                 else:
                     end = date_end
                 recurrings = rrule.rrule(

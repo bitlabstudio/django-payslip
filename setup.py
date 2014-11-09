@@ -26,7 +26,6 @@ setup(
     install_requires=[
         'django',
         'xhtml2pdf',
-        'pytz',
     ],
     tests_require=[
         'fabric',

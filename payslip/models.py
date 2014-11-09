@@ -1,6 +1,6 @@
 """Models for the ``payslip`` application."""
 from django.db import models
-from django.utils.timezone import now
+from django.utils.timezone import localtime, now
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -255,3 +255,13 @@ class Payment(models.Model):
     def __unicode__(self):
         return '{0} - {1} ({2})'.format(self.payment_type, self.amount,
                                         self.employee)
+
+    def get_date_without_tz(self):
+        return localtime(self.date).replace(tzinfo=None)
+
+    def get_end_date_without_tz(self):
+        return localtime(self.end_date).replace(tzinfo=None)
+
+    @property
+    def is_recurring(self):
+        return self.payment_type.rrule

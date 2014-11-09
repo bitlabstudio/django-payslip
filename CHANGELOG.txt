@@ -1,8 +1,12 @@
 === 0.1.X (ongoing) ===
 
 TODO: Add employee dasboard
+
+=== 0.2 ===
+
 - Made use of timezones
 - updated requirements and templates
+- Fixed single payment generator
 
 === 0.1 ===
 
