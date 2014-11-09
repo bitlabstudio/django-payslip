@@ -1,6 +1,7 @@
 """Views for the ``online_docs`` app."""
 import cStringIO as StringIO
 import os
+import pytz
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -274,8 +275,10 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
         if hasattr(self, 'post_data'):
             # Get form data
             employee = Employee.objects.get(pk=self.post_data.get('employee'))
-            date_start = parser.parse(self.post_data.get('date_start'))
-            date_end = parser.parse(self.post_data.get('date_end'))
+            date_start = parser.parse(
+                self.post_data.get('date_start')).replace(tzinfo=pytz.UTC)
+            date_end = parser.parse(
+                self.post_data.get('date_end')).replace(tzinfo=pytz.UTC)
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
@@ -284,7 +287,8 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 # Recurring payments with past date and end_date in the
                 # selected year or later
                 Q(date__lte=date_end, end_date__gte=parser.parse(
-                    '{0}0101T000000'.format(date_start.year)),
+                    '{0}0101T000000'.format(date_start.year)).replace(
+                        tzinfo=pytz.UTC),
                   payment_type__rrule__isnull=False) |
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
@@ -320,7 +324,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 # January 1st as a start, otherwise take the original date
                 if payment.date.year < date_start.year:
                     start = parser.parse('{0}0101T000000'.format(
-                        date_start.year))
+                        date_start.year)).replace(tzinfo=pytz.UTC)
                 else:
                     start = payment.date
                 # If the payments ends before the period's end date, let's take

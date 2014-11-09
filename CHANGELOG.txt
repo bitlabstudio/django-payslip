@@ -1,6 +1,7 @@
 === 0.1.X (ongoing) ===
 
 TODO: Add employee dasboard
+- Made use of timezones
 - updated requirements and templates
 
 === 0.1 ===
