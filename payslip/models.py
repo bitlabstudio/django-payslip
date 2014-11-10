@@ -29,6 +29,9 @@ class Company(models.Model):
         blank=True, null=True,
     )
 
+    class Meta:
+        ordering = ['name', ]
+
     def __unicode__(self):
         return '{0}'.format(self.name)
 
@@ -90,6 +93,9 @@ class Employee(models.Model):
         verbose_name=_('is Manager'),
     )
 
+    class Meta:
+        ordering = ['company__name', 'user__first_name', ]
+
     def __unicode__(self):
         return '{0} {1}'.format(self.user.first_name, self.user.last_name)
 
@@ -131,6 +137,9 @@ class ExtraFieldType(models.Model):
         verbose_name=_('Fixed values'),
     )
 
+    class Meta:
+        ordering = ['name', ]
+
     def __unicode__(self):
         return '{0}'.format(self.name)
 
@@ -155,6 +164,9 @@ class ExtraField(models.Model):
         max_length=200,
         verbose_name=_('Value'),
     )
+
+    class Meta:
+        ordering = ['field_type__name', ]
 
     def __unicode__(self):
         return '{0} ({1}) - {2}'.format(
@@ -191,6 +203,9 @@ class PaymentType(models.Model):
         blank=True, null=True,
         verbose_name=_('Description'),
     )
+
+    class Meta:
+        ordering = ['name', ]
 
     def __unicode__(self):
         if self.rrule:
@@ -251,6 +266,9 @@ class Payment(models.Model):
         blank=True, null=True,
         verbose_name=_('Description'),
     )
+
+    class Meta:
+        ordering = ['employee__user__first_name', '-date', ]
 
     def __unicode__(self):
         return '{0} - {1} ({2})'.format(self.payment_type, self.amount,
