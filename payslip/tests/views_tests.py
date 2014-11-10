@@ -1,6 +1,5 @@
 """Tests for the views of the ``payslip`` app."""
 from django.core.urlresolvers import reverse
-from django.template.defaultfilters import date
 from django.test import TestCase
 from django.utils import timezone
 
@@ -450,11 +449,8 @@ class PayslipGeneratorViewTestCase(ViewTestMixin, TestCase):
         self.should_be_callable_when_authenticated(self.staff)
         data = {
             'employee': self.employee.id,
-            'date_start': date(timezone.now().replace(day=1),
-                               'SHORT_DATE_FORMAT'),
-            'date_end': date(timezone.now().replace(
-                month=timezone.now().month+1, day=1) - timezone.timedelta(
-                    days=1), 'SHORT_DATE_FORMAT'),
+            'year': timezone.now().year,
+            'month': timezone.now().month,
         }
         self.is_callable(method='POST', data=data, user=self.staff)
         data.update({'employee': self.employee2.id})

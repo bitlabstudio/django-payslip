@@ -23,6 +23,7 @@
 
 		@frame footer {
 			-pdf-frame-content: footer;
+			-pdf-frame-border: 1pt solid black;
 			bottom: 2cm;
 			left: 4cm;
 			right: 2cm;

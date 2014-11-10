@@ -220,16 +220,32 @@ class ExtraFieldForm(forms.ModelForm):
 
 class PayslipForm(forms.Form):
     """Form to create a custom payslip."""
-    # First day of the last month
-    date_start = forms.DateField(
-        initial=timezone.now().replace(day=1) - relativedelta(months=1))
-    # Last day of the last month
-    date_end = forms.DateField(initial=timezone.now().replace(
-        month=timezone.now().month, day=1) - timezone.timedelta(days=1))
+    year = forms.ChoiceField()
+    month = forms.ChoiceField()
     employee = forms.ChoiceField()
 
     def __init__(self, company, *args, **kwargs):
         super(PayslipForm, self).__init__(*args, **kwargs)
+        last_month = timezone.now().replace(day=1) - relativedelta(months=1)
+        self.fields['month'].choices = (
+            (1, _('January')),
+            (2, _('February')),
+            (3, _('March')),
+            (4, _('April')),
+            (5, _('May')),
+            (6, _('June')),
+            (7, _('July')),
+            (8, _('August')),
+            (9, _('September')),
+            (10, _('October')),
+            (11, _('November')),
+            (12, _('December')),
+        )
+        self.fields['month'].initial = last_month.month
+        current_year = timezone.now().year
+        self.fields['year'].choices = [
+            (current_year - x, current_year - x) for x in range(0, 20)]
+        self.fields['year'].initial = last_month.year
         self.company = company
         if self.company:
             self.fields['employee'].choices = [(

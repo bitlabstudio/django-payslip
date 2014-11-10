@@ -1,5 +1,6 @@
 """Views for the ``online_docs`` app."""
 import cStringIO as StringIO
+from datetime import datetime
 import os
 
 from django.contrib.auth.decorators import login_required
@@ -15,7 +16,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from dateutil import parser, rrule
+from dateutil import relativedelta, rrule
 from xhtml2pdf import pisa
 
 from .app_settings import CURRENCY
@@ -274,8 +275,17 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
         if hasattr(self, 'post_data'):
             # Get form data
             employee = Employee.objects.get(pk=self.post_data.get('employee'))
-            date_start = parser.parse(self.post_data.get('date_start'))
-            date_end = parser.parse(self.post_data.get('date_end'))
+            date_start = datetime.strptime(
+                '{}-{}-01'.format(
+                    self.post_data.get('year'), self.post_data.get('month')),
+                '%Y-%m-%d',
+            )
+            january_1st = datetime.strptime(
+                '{}-01-01'.format(self.post_data.get('year')),
+                '%Y-%m-%d',
+            )
+            date_end = (date_start + relativedelta.relativedelta(months=1)
+                        - relativedelta.relativedelta(days=1))
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
@@ -284,8 +294,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                   payment_type__rrule__isnull=True) |
                 # Recurring payments with past date and end_date in the
                 # selected year or later
-                Q(date__lte=date_end, end_date__gte=parser.parse(
-                    '{0}0101T000000'.format(date_start.year)),
+                Q(date__lte=date_end, end_date__gte=january_1st,
                   payment_type__rrule__isnull=False) |
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
@@ -320,8 +329,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 # If the recurring payment started in a year before, let's take
                 # January 1st as a start, otherwise take the original date
                 if payment.get_date_without_tz().year < date_start.year:
-                    start = parser.parse('{0}0101T000000'.format(
-                        date_start.year))
+                    start = january_1st
                 else:
                     start = payment.get_date_without_tz()
                 # If the payments ends before the period's end date, let's take

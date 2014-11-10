@@ -63,7 +63,7 @@
 </div>
 <hr />
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-4">
         <h2>{% trans "Payment types" %}</h2>
         <p>{% trans "Define single or recurring payment types." %}</p>
         <table class="table table-bordered table-striped">
@@ -87,7 +87,7 @@
         </table>
         <a class="btn btn-default" href="{% url "payslip_payment_type_create" %}">{% trans "Create new payment type" %}</a>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-8">
         <h2>{% trans "Payments" %}</h2>
         <p>{% trans "Add payments to an employee." %}</p>
         <table class="table table-bordered table-striped">
@@ -96,6 +96,7 @@
                 <th>{% trans "Employee" %}</th>
                 <th>{% trans "Amount" %}</th>
                 <th>{% trans "Date" %}</th>
+                <th>{% trans "End" %}</th>
                 <th>{% trans "Action" %}</th>
             </tr>
             {% for payment in payments %}
@@ -104,6 +105,7 @@
                     <td>{{ payment.employee }}</td>
                     <td>{{ payment.amount }}</td>
                     <td>{{ payment.date|date }}</td>
+                    <td>{{ payment.end_date|date }}</td>
                     <td>
                         <a class="label label-default" href="{% url "payslip_payment_update" pk=payment.pk %}">{% trans "Update" %}</a>
                         <a class="label label-danger" href="{% url "payslip_payment_delete" pk=payment.pk %}">{% trans "Delete" %}</a>
@@ -111,7 +113,7 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="5">{% trans "No payments defined." %}</td>
+                    <td colspan="6">{% trans "No payments defined." %}</td>
                 </tr>
             {% endfor %}
         </table>
