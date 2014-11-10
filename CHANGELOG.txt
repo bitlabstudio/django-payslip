@@ -1,6 +1,8 @@
-=== 0.1.X (ongoing) ===
+=== 0.2.X (ongoing) ===
 
 TODO: Add employee dasboard
+- Improved dashboard template
+- Improved payslip form
 
 === 0.2 ===
 
