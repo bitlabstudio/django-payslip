@@ -3,6 +3,7 @@
 TODO: Add employee dasboard
 - Improved dashboard template
 - Improved payslip form
+- Fixed payment querysets
 
 === 0.2 ===
 

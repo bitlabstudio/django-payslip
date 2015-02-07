@@ -289,17 +289,17 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
-                # Single payments in this year
-                Q(date__year=date_start.year,
-                  payment_type__rrule__isnull=True) |
                 # Recurring payments with past date and end_date in the
                 # selected year or later
-                Q(date__lte=date_end, end_date__gte=january_1st,
-                  payment_type__rrule__isnull=False) |
+                Q(date__lte=date_end, end_date__gte=january_1st) |
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
                   payment_type__rrule__isnull=False)
+            ).exclude(payment_type__rrule__exact='') | employee.payments.filter(
+                # Single payments in this year
+                date__year=date_start.year, payment_type__rrule__exact='',
             )
+
             # Get payments for the selected period
             payments = payments_year.exclude(
                 # Exclude single payments not transferred in the period
