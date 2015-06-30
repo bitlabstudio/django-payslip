@@ -5,7 +5,7 @@
 		-pdf-page-size: a4;
 
 		margin-top: 2cm;
-		margin-left: 4cm;
+		margin-left: 3cm;
 		margin-right: 2cm;
 		margin-bottom: 3cm;
 
@@ -17,7 +17,7 @@
 		-pdf-page-size: a4;
 
 		margin-top: 2cm;
-		margin-left: 4cm;
+		margin-left: 3cm;
 		margin-right: 2cm;
 		margin-bottom: 3cm;
 
@@ -25,14 +25,14 @@
 			-pdf-frame-content: footer;
 			-pdf-frame-border: 1pt solid black;
 			bottom: 2cm;
-			left: 4cm;
+			left: 3cm;
 			right: 2cm;
 			height: 1cm;
 		}
 	}
 
 	html {
-		border: 1px none;
+		border: none;
 		display: inline;
 		width: auto;
 		height: auto;
@@ -48,24 +48,20 @@
 		display: block;
 	}
 
-	h2 {
-		border-bottom: 1px solid #000000;
-	}
-
 	#payslipMenu {
 		display: none;
 	}
 
 	.tdMiddle {
-		width: 55%;
+		max-width: 55%;
 	}
 
 	.tdMini {
-		width: 20%;
+		max-width: 20%;
 	}
 
 	.tdSmall {
-		width: 30%;
+		max-width: 30%;
 	}
 }
 
@@ -129,7 +125,7 @@ html {
 }
 
 #address {
-	width: 45%;
+	width: 57%;
 }
 
 #addressCompany {
@@ -184,7 +180,7 @@ h2 {
 	margin-top: 50px;
 	margin-bottom: 10px;
     -pdf-outline-level: 1;
-	padding: 5px 5px 0px;
+	padding: 5px;
 	line-height: 140%;
 	background-color: #222222;
 	color: #ffffff;

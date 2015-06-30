@@ -12,7 +12,7 @@ You need to install the following prerequisites in order to use this app::
     pip install Django
     pip install South
     pip install python-dateutil
-    pip install xhtml2pdf
+    pip install WeasyPrint
 
 If you want to install the latest stable release from PyPi::
 

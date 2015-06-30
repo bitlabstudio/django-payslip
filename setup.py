@@ -25,7 +25,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'django',
-        'xhtml2pdf',
+        'weasyprint',
     ],
     tests_require=[
         'fabric',

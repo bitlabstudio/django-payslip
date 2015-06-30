@@ -4,6 +4,7 @@ TODO: Add employee dasboard
 - Improved dashboard template
 - Improved payslip form
 - Fixed payment querysets
+- Changed to weasyprint
 
 === 0.2 ===
 

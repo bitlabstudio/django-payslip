@@ -1,5 +1,4 @@
 """Views for the ``online_docs`` app."""
-import cStringIO as StringIO
 from datetime import datetime
 import os
 
@@ -17,7 +16,7 @@ from django.views.generic import (
 )
 
 from dateutil import relativedelta, rrule
-from xhtml2pdf import pisa
+from weasyprint import HTML, CSS
 
 from .app_settings import CURRENCY
 from .forms import (
@@ -284,8 +283,8 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 '{}-01-01'.format(self.post_data.get('year')),
                 '%Y-%m-%d',
             )
-            date_end = (date_start + relativedelta.relativedelta(months=1)
-                        - relativedelta.relativedelta(days=1))
+            date_end = (date_start + relativedelta.relativedelta(months=1) -
+                        relativedelta.relativedelta(days=1))
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
@@ -295,7 +294,8 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 # Recurring payments with past date in period and open end
                 Q(date__lte=date_end, end_date__isnull=True,
                   payment_type__rrule__isnull=False)
-            ).exclude(payment_type__rrule__exact='') | employee.payments.filter(
+            ).exclude(
+                payment_type__rrule__exact='') | employee.payments.filter(
                 # Single payments in this year
                 date__year=date_start.year, payment_type__rrule__exact='',
             )
@@ -334,8 +334,8 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                     start = payment.get_date_without_tz()
                 # If the payments ends before the period's end date, let's take
                 # this date, otherwise we can take the period's end
-                if (payment.end_date
-                        and payment.get_end_date_without_tz() < date_end):
+                if (payment.end_date and
+                        payment.get_end_date_without_tz() < date_end):
                     end = payment.get_end_date_without_tz()
                 else:
                     end = date_end
@@ -373,14 +373,11 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
     def form_valid(self, form):
         self.post_data = self.request.POST
         if 'download' in self.post_data:
-            result = StringIO.StringIO()
             html = self.render_to_response(self.get_context_data(form=form))
             f = open(os.path.join(
                 os.path.dirname(__file__), './static/payslip/css/payslip.css'))
-            pdf = pisa.CreatePDF(html.render().content, result,
-                                 default_css=f.read())
+            pdf = HTML(string=html.render().content).write_pdf(
+                stylesheets=[CSS(file_obj=f)])
             f.close()
-            if not pdf.err:
-                return HttpResponse(result.getvalue(),
-                                    mimetype='application/pdf')
+            return HttpResponse(pdf, mimetype='application/pdf')
         return self.render_to_response(self.get_context_data(form=form))

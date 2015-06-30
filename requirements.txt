@@ -6,10 +6,9 @@
 Django==1.6.5
 South==0.8.4
 python-dateutil==2.2
-xhtml2pdf==0.0.6
+WeasyPrint==0.23
 -e git+git://github.com/pinax/django-mailer.git@919805e25fc18b06487b25414d4e5d5e05a92108#egg=mailer
-reportlab==2.7
-django-libs==1.64.7
+django-libs==1.66.3
 
 # ==============================================================
 # Packages needed for running the tests. Needed by contributors.
@@ -20,4 +19,4 @@ coverage==3.7.1
 django-coverage==1.2.4
 factory-boy==2.4.1
 ipdb==0.8
-flake8==2.2.5
+flake8==2.4.1
