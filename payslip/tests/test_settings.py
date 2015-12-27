@@ -41,7 +41,7 @@ COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(
 
 COVERAGE_MODULE_EXCLUDES = [
     'tests$', 'settings$', 'urls$', 'locale$',
-    'migrations', 'fixtures', 'admin$', 'django_extensions',
+    'south_migrations', 'fixtures', 'admin$', 'django_extensions',
 ]
 
 EXTERNAL_APPS = [
