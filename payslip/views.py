@@ -379,5 +379,5 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
             pdf = HTML(string=html.render().content).write_pdf(
                 stylesheets=[CSS(file_obj=f)])
             f.close()
-            return HttpResponse(pdf, mimetype='application/pdf')
+            return HttpResponse(pdf, content_type='application/pdf')
         return self.render_to_response(self.get_context_data(form=form))

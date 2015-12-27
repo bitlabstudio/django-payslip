@@ -3,12 +3,11 @@
 # ===========================================================================
 # Packages essential to this app. Needed by anyone who wants to use this app.
 # ===========================================================================
-Django==1.6.5
-South==0.8.4
-python-dateutil==2.2
-WeasyPrint==0.23
--e git+git://github.com/pinax/django-mailer.git@919805e25fc18b06487b25414d4e5d5e05a92108#egg=mailer
-django-libs==1.66.3
+Django==1.8.7
+python-dateutil==2.4.2
+WeasyPrint==0.25
+django-mailer==1.1
+django-libs==1.66.12
 
 # ==============================================================
 # Packages needed for running the tests. Needed by contributors.
