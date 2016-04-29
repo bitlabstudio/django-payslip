@@ -1,9 +1,12 @@
 """Models for the ``payslip`` application."""
+from django.conf import settings
 from django.db import models
 from django.utils.timezone import localtime, now
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
+@python_2_unicode_compatible
 class Company(models.Model):
     """
     Model, which holds general information of a company.
@@ -26,16 +29,17 @@ class Company(models.Model):
     extra_fields = models.ManyToManyField(
         'payslip.ExtraField',
         verbose_name=_('Extra fields'),
-        blank=True, null=True,
+        blank=True,
     )
 
     class Meta:
         ordering = ['name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.name)
 
 
+@python_2_unicode_compatible
 class Employee(models.Model):
     """
     Model, which holds personal information of employee.
@@ -50,7 +54,7 @@ class Employee(models.Model):
 
     """
     user = models.ForeignKey(
-        'auth.User',
+        settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         related_name='employees',
     )
@@ -85,7 +89,7 @@ class Employee(models.Model):
     extra_fields = models.ManyToManyField(
         'payslip.ExtraField',
         verbose_name=_('Extra fields'),
-        blank=True, null=True,
+        blank=True,
     )
 
     is_manager = models.BooleanField(
@@ -96,10 +100,11 @@ class Employee(models.Model):
     class Meta:
         ordering = ['company__name', 'user__first_name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0} {1}'.format(self.user.first_name, self.user.last_name)
 
 
+@python_2_unicode_compatible
 class ExtraFieldType(models.Model):
     """
     Model to create custom information holders.
@@ -140,10 +145,11 @@ class ExtraFieldType(models.Model):
     class Meta:
         ordering = ['name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0}'.format(self.name)
 
 
+@python_2_unicode_compatible
 class ExtraField(models.Model):
     """
     Model to create custom fields.
@@ -168,12 +174,13 @@ class ExtraField(models.Model):
     class Meta:
         ordering = ['field_type__name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0} ({1}) - {2}'.format(
             self.field_type, self.field_type.get_model_display() or 'general',
             self.value)
 
 
+@python_2_unicode_compatible
 class PaymentType(models.Model):
     """
     Model to create payment types.
@@ -207,12 +214,13 @@ class PaymentType(models.Model):
     class Meta:
         ordering = ['name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         if self.rrule:
             return '{0} ({1})'.format(self.name, self.get_rrule_display())
         return '{0}'.format(self.name)
 
 
+@python_2_unicode_compatible
 class Payment(models.Model):
     """
     Model, which represents one single payment.
@@ -258,7 +266,7 @@ class Payment(models.Model):
     extra_fields = models.ManyToManyField(
         'payslip.ExtraField',
         verbose_name=_('Extra fields'),
-        blank=True, null=True,
+        blank=True,
     )
 
     description = models.CharField(
@@ -270,7 +278,7 @@ class Payment(models.Model):
     class Meta:
         ordering = ['employee__user__first_name', '-date', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return '{0} - {1} ({2})'.format(self.payment_type, self.amount,
                                         self.employee)
 

@@ -1,87 +1,64 @@
 """Tests for the views of the ``payslip`` app."""
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from django_libs.tests.factories import UserFactory
-from django_libs.tests.mixins import ViewTestMixin
-from payslip.tests.factories import (
-    CompanyFactory,
-    EmployeeFactory,
-    ExtraFieldFactory,
-    ExtraFieldTypeFactory,
-    ManagerFactory,
-    PaymentFactory,
-    PaymentTypeFactory,
-    StaffFactory,
-)
+from django_libs.tests.mixins import ViewRequestFactoryTestMixin
+from mixer.backend.django import mixer
+
+from .. import views
 
 
-class DashboardViewTestCase(ViewTestMixin, TestCase):
+class DashboardViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the TemplateView ``DashboardView``."""
-    longMessage = True
+    view_class = views.DashboardView
 
     def setUp(self):
-        self.user = UserFactory()
-
-    def get_view_name(self):
-        return 'payslip_dashboard'
+        self.user = mixer.blend('auth.User')
 
     def test_view(self):
         self.is_not_callable(user=self.user)
         self.user.is_staff = True
         self.user.save()
-        self.should_be_callable_when_authenticated(self.user)
+        self.is_callable(user=self.user)
 
 
-class CompanyCreateViewTestCase(ViewTestMixin, TestCase):
+class CompanyCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``CompanyCreateView``."""
-    longMessage = True
+    view_class = views.CompanyCreateView
 
     def setUp(self):
-        self.user = UserFactory()
-        self.user.is_staff = True
-        self.user.save()
-
-    def get_view_name(self):
-        return 'payslip_company_create'
+        self.user = mixer.blend('auth.User', is_staff=True)
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.user)
-        self.is_callable(method='POST', data={'name': 'Foo'}, user=self.user,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.user)
+        self.is_postable(data={'name': 'Foo'}, user=self.user,
+                         to_url_name='payslip_dashboard')
 
 
-class CompanyUpdateViewTestCase(ViewTestMixin, TestCase):
+class CompanyUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``CompanyUpdateView``."""
-    longMessage = True
+    view_class = views.CompanyUpdateView
 
     def setUp(self):
-        self.user = UserFactory()
+        self.user = mixer.blend('auth.User')
         self.user.is_staff = True
         self.user.save()
-        self.company = CompanyFactory()
-
-    def get_view_name(self):
-        return 'payslip_company_update'
+        self.company = mixer.blend('payslip.Company')
 
     def get_view_kwargs(self):
         return {'pk': self.company.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.user)
+        self.is_callable(user=self.user)
 
 
-class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
+class CompanyDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``CompanyDeleteView``."""
-    longMessage = True
+    view_class = views.CompanyDeleteView
 
     def setUp(self):
-        self.user = UserFactory()
-        self.company = CompanyFactory()
-
-    def get_view_name(self):
-        return 'payslip_company_delete'
+        self.user = mixer.blend('auth.User')
+        self.company = mixer.blend('payslip.Company')
 
     def get_view_kwargs(self):
         return {'pk': self.company.pk}
@@ -90,23 +67,20 @@ class CompanyDeleteViewTestCase(ViewTestMixin, TestCase):
         self.is_not_callable(user=self.user)
         self.user.is_staff = True
         self.user.save()
-        self.should_be_callable_when_authenticated(self.user)
-        self.is_callable(method='POST', data={'delete': True}, user=self.user,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.user)
+        self.is_postable(data={'delete': True}, user=self.user,
+                         to_url_name='payslip_dashboard')
 
 
-class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
+class EmployeeCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``EmployeeCreateView``."""
-    longMessage = True
+    view_class = views.EmployeeCreateView
 
     def setUp(self):
-        self.manager = ManagerFactory()
-
-    def get_view_name(self):
-        return 'payslip_employee_create'
+        self.manager = mixer.blend('payslip.Employee', is_manager=True)
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.manager.user)
+        self.is_callable(user=self.manager.user)
         data = {
             'first_name': 'Foo',
             'last_name': 'Bar',
@@ -115,42 +89,43 @@ class EmployeeCreateViewTestCase(ViewTestMixin, TestCase):
             'retype_password': 'test',
             'title': '1',
         }
-        self.is_callable(method='POST', data=data, user=self.manager.user,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_postable(data=data, user=self.manager.user,
+                         to_url_name='payslip_dashboard')
 
 
-class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
+class EmployeeUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``EmployeeUpdateView``."""
-    longMessage = True
+    view_class = views.EmployeeUpdateView
 
     def setUp(self):
-        self.manager = ManagerFactory()
-        self.employee = EmployeeFactory(company=self.manager.company)
-        self.staff = StaffFactory()
-        extra_field_type = ExtraFieldTypeFactory()
-        extra_field_type2 = ExtraFieldTypeFactory(name='Tax Class')
-        extra_field_type3 = ExtraFieldTypeFactory(name='Health',
-                                                       fixed_values=False)
-        ExtraFieldTypeFactory(name='Religion', fixed_values=False)
-        extra_field = ExtraFieldFactory(field_type=extra_field_type)
+        self.manager = mixer.blend('payslip.Employee', is_manager=True)
+        self.employee = mixer.blend('payslip.Employee',
+                                    company=self.manager.company)
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        extra_field_type = mixer.blend('payslip.ExtraFieldType')
+        extra_field_type2 = mixer.blend('payslip.ExtraFieldType',
+                                        name='Tax Class')
+        extra_field_type3 = mixer.blend('payslip.ExtraFieldType',
+                                        name='Health', fixed_values=False)
+        mixer.blend('payslip.ExtraFieldType', name='Religion',
+                    fixed_values=False)
+        extra_field = mixer.blend('payslip.ExtraField',
+                                  field_type=extra_field_type)
         self.employee.extra_fields.add(extra_field)
-        extra_field2 = ExtraFieldFactory(field_type=extra_field_type2,
-                                         value='II')
+        extra_field2 = mixer.blend('payslip.ExtraField',
+                                   field_type=extra_field_type2, value='II')
         self.employee.extra_fields.add(extra_field2)
-        extra_field3 = ExtraFieldFactory(field_type=extra_field_type3,
-                                         value='yes')
+        extra_field3 = mixer.blend('payslip.ExtraField',
+                                   field_type=extra_field_type3, value='yes')
         self.employee.extra_fields.add(extra_field3)
-
-    def get_view_name(self):
-        return 'payslip_employee_update'
 
     def get_view_kwargs(self):
         return {'pk': self.employee.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.manager.user)
+        self.is_callable(user=self.manager.user)
         self.is_not_callable(user=self.employee.user)
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
         data = {
             'first_name': 'Foo',
             'last_name': 'Bar',
@@ -160,300 +135,262 @@ class EmployeeUpdateViewTestCase(ViewTestMixin, TestCase):
             'Health': 'no',
             'Religion': 'None',
         }
-        self.is_callable(method='POST', data=data, user=self.manager.user,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_postable(data=data, user=self.manager.user,
+                         to_url_name='payslip_dashboard')
 
 
-class EmployeeDeleteViewTestCase(ViewTestMixin, TestCase):
+class EmployeeDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``EmployeeDeleteView``."""
-    longMessage = True
+    view_class = views.EmployeeDeleteView
 
     def setUp(self):
-        self.manager = ManagerFactory()
-        self.employee = EmployeeFactory(company=self.manager.company)
-
-    def get_view_name(self):
-        return 'payslip_employee_delete'
+        self.manager = mixer.blend('payslip.Employee', is_manager=True)
+        self.employee = mixer.blend('payslip.Employee',
+                                    company=self.manager.company)
 
     def get_view_kwargs(self):
         return {'pk': self.employee.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.manager.user)
-        self.is_callable(method='POST', data={'delete': True},
-                         user=self.manager.user,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.manager.user)
+        self.is_postable(data={'delete': True}, user=self.manager.user,
+                         to_url_name='payslip_dashboard')
 
 
-class ExtraFieldCreateViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``ExtraFieldCreateView``."""
-    longMessage = True
+    view_class = views.ExtraFieldCreateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.extra_field_type = ExtraFieldTypeFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_create'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.extra_field_type = mixer.blend('payslip.ExtraFieldType',
+                                            fixed_values=True)
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
         data = {
             'field_type': self.extra_field_type.id,
             'value': 'Bar',
         }
-        self.is_callable(method='POST', data=data, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_postable(data=data, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class ExtraFieldUpdateViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldUpdateView``."""
-    longMessage = True
+    view_class = views.ExtraFieldUpdateView
 
     def setUp(self):
-        self.extra_field = ExtraFieldFactory()
-        self.staff = StaffFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_update'
+        self.extra_field = mixer.blend('payslip.ExtraField')
+        self.staff = mixer.blend('auth.User', is_staff=True)
 
     def get_view_kwargs(self):
         return {'pk': self.extra_field.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
 
 
-class ExtraFieldDeleteViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``ExtraFieldDeleteView``."""
-    longMessage = True
+    view_class = views.ExtraFieldDeleteView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.extra_field = ExtraFieldFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_delete'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.extra_field = mixer.blend('payslip.ExtraField')
 
     def get_view_kwargs(self):
         return {'pk': self.extra_field.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'delete': True}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class ExtraFieldTypeCreateViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldTypeCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``ExtraFieldTypeCreateView``."""
-    longMessage = True
+    view_class = views.ExtraFieldTypeCreateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_type_create'
+        self.staff = mixer.blend('auth.User', is_staff=True)
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'name': 'Bar'}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class ExtraFieldTypeUpdateViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldTypeUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``ExtraFieldTypeUpdateView``."""
-    longMessage = True
+    view_class = views.ExtraFieldTypeUpdateView
 
     def setUp(self):
-        self.extra_field_type = ExtraFieldTypeFactory()
-        self.staff = StaffFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_type_update'
+        self.extra_field_type = mixer.blend('payslip.ExtraFieldType')
+        self.staff = mixer.blend('auth.User', is_staff=True)
 
     def get_view_kwargs(self):
         return {'pk': self.extra_field_type.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
 
 
-class ExtraFieldTypeDeleteViewTestCase(ViewTestMixin, TestCase):
+class ExtraFieldTypeDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``ExtraFieldTypeDeleteView``."""
-    longMessage = True
+    view_class = views.ExtraFieldTypeDeleteView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.extra_field_type = ExtraFieldTypeFactory()
-
-    def get_view_name(self):
-        return 'payslip_extra_field_type_delete'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.extra_field_type = mixer.blend('payslip.ExtraFieldType')
 
     def get_view_kwargs(self):
         return {'pk': self.extra_field_type.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'delete': True}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentCreateViewTestCase(ViewTestMixin, TestCase):
+class PaymentCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``PaymentCreateView``."""
-    longMessage = True
+    view_class = views.PaymentCreateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.payment_type = PaymentTypeFactory()
-        self.employee = EmployeeFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_create'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.payment_type = mixer.blend('payslip.PaymentType')
+        self.employee = mixer.blend('payslip.Employee')
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
         data = {
             'payment_type': self.payment_type.id,
             'employee': self.employee.id,
             'amount': '1001.00',
             'date': '2013-01-08 09:35:18',
         }
-        self.is_callable(method='POST', data=data, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_postable(data=data, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentUpdateViewTestCase(ViewTestMixin, TestCase):
+class PaymentUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``PaymentUpdateView``."""
-    longMessage = True
+    view_class = views.PaymentUpdateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.payment = PaymentFactory()
-        self.employee = EmployeeFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_update'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.payment = mixer.blend('payslip.Payment')
+        self.employee = mixer.blend('payslip.Employee')
 
     def get_view_kwargs(self):
         return {'pk': self.payment.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
         data = {
             'payment_type': self.payment.payment_type.id,
             'employee': self.employee.id,
             'amount': '1001.00',
             'date': '2013-01-08 09:35:18',
         }
-        self.is_callable(method='POST', data=data, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_postable(data=data, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentDeleteViewTestCase(ViewTestMixin, TestCase):
+class PaymentDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``PaymentDeleteView``."""
-    longMessage = True
+    view_class = views.PaymentDeleteView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.payment = PaymentFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_delete'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.payment = mixer.blend('payslip.Payment')
 
     def get_view_kwargs(self):
         return {'pk': self.payment.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'delete': True}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentTypeCreateViewTestCase(ViewTestMixin, TestCase):
+class PaymentTypeCreateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the CreateView ``PaymentTypeCreateView``."""
-    longMessage = True
+    view_class = views.PaymentTypeCreateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_type_create'
+        self.staff = mixer.blend('auth.User', is_staff=True)
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'name': 'Bar'}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentTypeUpdateViewTestCase(ViewTestMixin, TestCase):
+class PaymentTypeUpdateViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the UpdateView ``PaymentTypeUpdateView``."""
-    longMessage = True
+    view_class = views.PaymentTypeUpdateView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.payment_type = PaymentTypeFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_type_update'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.payment_type = mixer.blend('payslip.PaymentType')
 
     def get_view_kwargs(self):
         return {'pk': self.payment_type.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'name': 'Bar'}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'name': 'Bar'}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PaymentTypeDeleteViewTestCase(ViewTestMixin, TestCase):
+class PaymentTypeDeleteViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the DeleteView ``PaymentTypeDeleteView``."""
-    longMessage = True
+    view_class = views.PaymentTypeDeleteView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.payment_type = PaymentTypeFactory()
-
-    def get_view_name(self):
-        return 'payslip_payment_type_delete'
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.payment_type = mixer.blend('payslip.PaymentType')
 
     def get_view_kwargs(self):
         return {'pk': self.payment_type.pk}
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
-        self.is_callable(method='POST', data={'delete': True}, user=self.staff,
-                         and_redirects_to=reverse('payslip_dashboard'))
+        self.is_callable(user=self.staff)
+        self.is_postable(data={'delete': True}, user=self.staff,
+                         to_url_name='payslip_dashboard')
 
 
-class PayslipGeneratorViewTestCase(ViewTestMixin, TestCase):
+class PayslipGeneratorViewTestCase(ViewRequestFactoryTestMixin, TestCase):
     """Tests for the FormView ``PayslipGeneratorView``."""
-    longMessage = True
+    view_class = views.PayslipGeneratorView
 
     def setUp(self):
-        self.staff = StaffFactory()
-        self.manager = ManagerFactory()
+        self.staff = mixer.blend('auth.User', is_staff=True)
+        self.manager = mixer.blend('payslip.Employee', is_manager=True)
         # Fixtures to test all context functions
-        self.payment = PaymentFactory(payment_type__rrule='MONTHLY')
+        self.payment = mixer.blend('payslip.Payment',
+                                   payment_type__rrule='MONTHLY')
         self.employee = self.payment.employee
-        self.employee2 = EmployeeFactory(company=self.manager.company)
-        PaymentFactory(payment_type__rrule='MONTHLY', employee=self.employee,
-                       date=timezone.now() - timezone.timedelta(days=365))
-        PaymentFactory(payment_type__rrule='MONTHLY', employee=self.employee,
-                       end_date=timezone.now() - timezone.timedelta(days=1),
-                       amount=-100)
-
-    def get_view_name(self):
-        return 'payslip_generator'
+        self.employee2 = mixer.blend('payslip.Employee',
+                                     company=self.manager.company)
+        mixer.blend('payslip.Payment', payment_type__rrule='MONTHLY',
+                    employee=self.employee,
+                    date=timezone.now() - timezone.timedelta(days=365))
+        mixer.blend('payslip.Payment', payment_type__rrule='MONTHLY',
+                    employee=self.employee, amount=-100,
+                    end_date=timezone.now() - timezone.timedelta(days=1))
 
     def test_view(self):
-        self.should_be_callable_when_authenticated(self.staff)
+        self.is_callable(user=self.staff)
         data = {
             'employee': self.employee.id,
             'year': timezone.now().year,
             'month': timezone.now().month,
         }
-        self.is_callable(method='POST', data=data, user=self.staff)
+        self.is_postable(data=data, user=self.staff, ajax=True)
         data.update({'employee': self.employee2.id})
-        self.is_callable(method='POST', data=data, user=self.staff)
+        self.is_postable(data=data, user=self.staff, ajax=True)
         data.update({'download': True})
-        self.is_callable(method='POST', data=data, user=self.manager.user)
+        self.is_postable(data=data, user=self.manager.user, ajax=True)

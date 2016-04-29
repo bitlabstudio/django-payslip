@@ -1,7 +1,8 @@
 """Forms for the ``payslip`` app."""
-import md5
+import hashlib
 
-from django.contrib.auth.models import make_password, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from django import forms
 from django.utils import timezone
@@ -9,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from dateutil.relativedelta import relativedelta
 
-from payslip.models import (
+from .models import (
     Company,
     Employee,
     ExtraField,
@@ -25,7 +26,9 @@ def get_md5_hexdigest(email):
     The length is 30 so that it fits into Django's ``User.username`` field.
 
     """
-    return md5.new(email).hexdigest()[0:30]
+    h = hashlib.new('md5')
+    h.update(email.encode('utf-8'))
+    return h.hexdigest()[0:30]
 
 
 def generate_username(email):
@@ -40,10 +43,10 @@ def generate_username(email):
     found_unique_username = False
     while not found_unique_username:
         try:
-            User.objects.get(username=username)
+            get_user_model().objects.get(username=username)
             email = '{0}a'.format(email)
             username = get_md5_hexdigest(email)
-        except User.DoesNotExist:
+        except get_user_model().DoesNotExist:
             found_unique_username = True
             return username
 
@@ -99,8 +102,8 @@ class ExtraFieldFormMixin(object):
                 else:
                     self.instance.extra_fields.add(field_to_save)
             else:
-                if field_to_save:
-                    field_to_save.value = self.data.get(extra_field_type.name)
+                if field_to_save and self.data.get(extra_field_type.name):
+                    field_to_save.value = self.data[extra_field_type.name]
                     field_to_save.save()
                 elif self.data.get(extra_field_type.name):
                     new_field = ExtraField(
@@ -146,8 +149,8 @@ class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
         """
         email = self.cleaned_data['email']
         try:
-            user = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
+            user = get_user_model().objects.get(email__iexact=email)
+        except get_user_model().DoesNotExist:
             return email
         if self.instance.id and user == self.instance.user:
             return email
@@ -175,20 +178,19 @@ class EmployeeForm(ExtraFieldFormMixin, forms.ModelForm):
 
     def save(self, *args, **kwargs):
         if self.instance.id:
-            User.objects.filter(pk=self.instance.user.pk).update(
+            get_user_model().objects.filter(pk=self.instance.user.pk).update(
                 first_name=self.cleaned_data.get('first_name'),
                 last_name=self.cleaned_data.get('last_name'),
                 email=self.cleaned_data.get('email'),
             )
         else:
-            user = User(
+            user = get_user_model().objects.create(
                 username=self.cleaned_data.get('email'),
                 first_name=self.cleaned_data.get('first_name'),
                 last_name=self.cleaned_data.get('last_name'),
                 email=self.cleaned_data.get('email'),
                 password=make_password(self.cleaned_data.get('password')),
             )
-            user.save()
             self.instance.user = user
         if self.company and self.company.pk:
             self.instance.company = Company.objects.get(pk=self.company.pk)
@@ -216,6 +218,7 @@ class ExtraFieldForm(forms.ModelForm):
 
     class Meta:
         model = ExtraField
+        fields = '__all__'
 
 
 class PayslipForm(forms.Form):

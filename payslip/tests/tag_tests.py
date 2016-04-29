@@ -1,8 +1,9 @@
 """Tests for the template filters and tags of the ``payslip`` app."""
 from django.test import TestCase
 
-from payslip.templatetags.payslip_tags import get_extra_field_value
-from payslip.tests.factories import ExtraFieldFactory, PaymentFactory
+from mixer.backend.django import mixer
+
+from ..templatetags.payslip_tags import get_extra_field_value
 
 
 class TemplateFilterTestCase(TestCase):
@@ -10,8 +11,8 @@ class TemplateFilterTestCase(TestCase):
     longMessage = True
 
     def setUp(self):
-        self.payment = PaymentFactory()
-        self.extra_field = ExtraFieldFactory()
+        self.payment = mixer.blend('payslip.Payment')
+        self.extra_field = mixer.blend('payslip.ExtraField')
 
     def test_get_extra_field_value(self):
         self.assertEqual(get_extra_field_value(

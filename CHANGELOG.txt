@@ -1,5 +1,6 @@
 === 0.3.X (ongoing) ===
 
+- Prepared app for Django 1.9 and Python 3.5
 - Upgrade to Django>=1.8
 
 === 0.2 ===

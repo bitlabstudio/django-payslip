@@ -122,6 +122,7 @@ class ExtraFieldMixin(object):
 class ExtraFieldTypeMixin(object):
     """Mixin to handle extra field type related functions."""
     model = ExtraFieldType
+    fields = '__all__'
 
 
 class PaymentMixin(object):
@@ -133,6 +134,7 @@ class PaymentMixin(object):
 class PaymentTypeMixin(object):
     """Mixin to handle payment type related functions."""
     model = PaymentType
+    fields = '__all__'
 
 
 # -------------#
@@ -158,6 +160,7 @@ class DashboardView(PermissionMixin, TemplateView):
 class CompanyCreateView(PermissionMixin, CreateView):
     """Classic view to create a company."""
     model = Company
+    fields = '__all__'
 
     def get_success_url(self):
         return reverse('payslip_dashboard')
@@ -166,6 +169,7 @@ class CompanyCreateView(PermissionMixin, CreateView):
 class CompanyUpdateView(CompanyMixin, UpdateView):
     """Classic view to update a company."""
     model = Company
+    fields = '__all__'
 
 
 class CompanyDeleteView(CompanyMixin, DeleteView):
@@ -377,7 +381,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
             f = open(os.path.join(
                 os.path.dirname(__file__), './static/payslip/css/payslip.css'))
             pdf = HTML(string=html.render().content).write_pdf(
-                stylesheets=[CSS(file_obj=f)])
+                stylesheets=[CSS(string=f.read())])
             f.close()
             return HttpResponse(pdf, content_type='application/pdf')
         return self.render_to_response(self.get_context_data(form=form))

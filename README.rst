@@ -10,6 +10,7 @@ Installation
 You need to install the following prerequisites in order to use this app::
 
     pip install Django
+    pip install django-libs
     pip install python-dateutil
     pip install WeasyPrint
 

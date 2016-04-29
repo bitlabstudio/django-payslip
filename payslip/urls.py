@@ -1,7 +1,7 @@
 """URLs for the ``online_docs`` app."""
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-from payslip.views import (
+from .views import (
     CompanyCreateView,
     CompanyDeleteView,
     CompanyUpdateView,
@@ -25,8 +25,7 @@ from payslip.views import (
 )
 
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^$',
         DashboardView.as_view(),
         name='payslip_dashboard',
@@ -126,4 +125,4 @@ urlpatterns = patterns(
         PayslipGeneratorView.as_view(),
         name='payslip_generator',
         ),
-)
+]

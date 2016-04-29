@@ -1,8 +1,8 @@
 """Variable filters for the ``payslip```application."""
-from django.template.base import Library
+from django.template import Library
 from django.utils.safestring import mark_safe
 
-from payslip.models import ExtraField
+from ..models import ExtraField
 
 register = Library()
 

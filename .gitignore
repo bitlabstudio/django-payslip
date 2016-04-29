@@ -1,8 +1,7 @@
 *.egg-info/
 *.pyc
-.ropeproject
 .tox
-chromedriver.log
+.coverage
 coverage/
 db.sqlite
 dist/

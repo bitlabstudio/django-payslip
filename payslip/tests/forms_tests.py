@@ -1,9 +1,9 @@
 """Tests for the forms of the ``payslip`` app."""
 from django.test import TestCase
 
-from django_libs.tests.factories import UserFactory
-from payslip import forms
-from payslip.tests.factories import ManagerFactory
+from mixer.backend.django import mixer
+
+from .. import forms
 
 
 class EmployeeFormTestCase(TestCase):
@@ -11,7 +11,7 @@ class EmployeeFormTestCase(TestCase):
     longMessage = True
 
     def test_form(self):
-        manager = ManagerFactory()
+        manager = mixer.blend('payslip.Employee', is_manager=True)
         data = {
             'first_name': 'Foo',
             'last_name': 'Bar',
@@ -30,7 +30,7 @@ class EmployeeFormTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_generate_username(self):
-        self.user = UserFactory()
+        self.user = mixer.blend('auth.User')
         self.user.username = forms.generate_username(self.user.email)
         self.user.save()
         self.assertIsNotNone(forms.generate_username(self.user.email))
