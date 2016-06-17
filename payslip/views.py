@@ -278,7 +278,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
         if hasattr(self, 'post_data'):
             # Get form data
             employee = Employee.objects.get(pk=self.post_data.get('employee'))
-            date_start = datetime.strptime(
+            self.date_start = datetime.strptime(
                 '{}-{}-01'.format(
                     self.post_data.get('year'), self.post_data.get('month')),
                 '%Y-%m-%d',
@@ -287,8 +287,8 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                 '{}-01-01'.format(self.post_data.get('year')),
                 '%Y-%m-%d',
             )
-            date_end = (date_start + relativedelta.relativedelta(months=1) -
-                        relativedelta.relativedelta(days=1))
+            date_end = self.date_start + relativedelta.relativedelta(
+                months=1) - relativedelta.relativedelta(days=1)
 
             # Get payments for the selected year
             payments_year = employee.payments.filter(
@@ -301,13 +301,13 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
             ).exclude(
                 payment_type__rrule__exact='') | employee.payments.filter(
                 # Single payments in this year
-                date__year=date_start.year, payment_type__rrule__exact='',
+                date__year=self.date_start.year, payment_type__rrule__exact='',
             )
 
             # Get payments for the selected period
             payments = payments_year.exclude(
                 # Exclude single payments not transferred in the period
-                Q(date__lt=date_start) |
+                Q(date__lt=self.date_start) |
                 Q(date__gt=date_end),
                 Q(payment_type__rrule__exact=''),
             ).filter(
@@ -332,7 +332,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
                     payment_type__rrule__exact=''):
                 # If the recurring payment started in a year before, let's take
                 # January 1st as a start, otherwise take the original date
-                if payment.get_date_without_tz().year < date_start.year:
+                if payment.get_date_without_tz().year < self.date_start.year:
                     start = january_1st
                 else:
                     start = payment.get_date_without_tz()
@@ -361,7 +361,7 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
 
             kwargs.update({
                 'employee': employee,
-                'date_start': date_start,
+                'date_start': self.date_start,
                 'date_end': date_end,
                 'payments': payments,
                 'payment_extra_fields': ExtraFieldType.objects.filter(
@@ -380,8 +380,12 @@ class PayslipGeneratorView(CompanyPermissionMixin, FormView):
             html = self.render_to_response(self.get_context_data(form=form))
             f = open(os.path.join(
                 os.path.dirname(__file__), './static/payslip/css/payslip.css'))
-            pdf = HTML(string=html.render().content).write_pdf(
-                stylesheets=[CSS(string=f.read())])
+            html = HTML(string=html.render().content)
+            pdf = html.write_pdf(stylesheets=[CSS(string=f.read())])
             f.close()
-            return HttpResponse(pdf, content_type='application/pdf')
+            resp = HttpResponse(pdf, content_type='application/pdf')
+            resp['Content-Disposition'] = \
+                u'attachment; filename="{}_{}.pdf"'.format(
+                    self.date_start.year, self.date_start.month)
+            return resp
         return self.render_to_response(self.get_context_data(form=form))
