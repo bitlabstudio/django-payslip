@@ -2,6 +2,6 @@ coverage
 mixer
 tox
 Fabric3
-paramiko==1.17.0
+paramiko==3.4.0
 ipdb
 flake8
